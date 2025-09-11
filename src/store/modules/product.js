@@ -58,7 +58,7 @@ export default {
             console.log("ログインレスポンス:", response.data);
 
             // ログイン成功の場合
-      if (response.data.result === "Succeeded") {
+      if (response.data.Result === "Succeeded") {
         
         // ユーザー名を保存
         commit('setUserName', response.data.User_name);
