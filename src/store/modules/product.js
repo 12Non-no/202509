@@ -82,7 +82,6 @@ export default {
       return { success: false, message: error.response?.data};
     }
   },
-  
     async signup ({ commit }, userData) { // 会員登録処理
         console.log('新規会員登録を開始');
             const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Insert_user?';
@@ -90,6 +89,34 @@ export default {
 
             commit;
             return response.data;
+    },
+    async sessionCheck ({ commit }, session) { // セッション確認&延長処理
+        console.log('セッション確認を開始');
+
+        // セッションIDが存在しない場合は即エラー表示
+        if(!session.Session_id){
+            this.dialogMessage = "セッションが存在しません。";
+            this.dialog = true;
+            return;
+        }
+        try{
+            const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/CheckSession?';
+            const response = await axios.post(url + 'Session_id=' + session.Session_id);
+
+            if(response.data.status === "Success"){
+                this.snackbar = true;
+                console.log("セッションチェック成功:", response.data);
+        } else {
+          // セッションが無効な場合はダイアログで警告表示
+          this.dialogMessage = response.data.message;
+          this.dialog = true;
+        }
+            }catch (error) {
+                console.error("セッションチェックエラー:", error);
+                this.dialogMessage = "セッションの確認に失敗しました。";
+                this.dialog = true;
+            }
+            commit;
     }
   }
 }
