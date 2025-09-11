@@ -11,7 +11,6 @@
           <div class="text-center">
             <v-card class="mx-auto pt-10 pb-10 rounded-xl" width="250px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToChat">
             <!-- カード内容 -->
-            
             旅行の相談をする
             </v-card>
             <v-card class="mx-auto pt-10 pb-10 rounded-xl" width="250px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToBook">
@@ -28,7 +27,7 @@
 
   <script>
     export default{
-      name: 'LoginView',
+      name: 'MyPage',
       computed: {
         User_id: {
           get() {
@@ -48,17 +47,10 @@
         }
       },
       methods: {
-        async login(){
-          try {
-            await this.$store.dispatch('product/login', this.$store.state.product.user);
-            // ログイン成功後にページ遷移
-            this.$router.push('/mypage');
-          } catch (error) {
-            alert(error.response.data);
-            
-          }
+        goToChat(){
+            this.$router.push('/signup');
           },
-        goToSignup(){
+        goToBook(){
           this.$router.push('/signup');
         }
     }

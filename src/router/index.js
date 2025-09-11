@@ -20,7 +20,7 @@ const routes = [
   },
   {
     path: '/mypage',
-    name: 'mypage',
+    name: 'MyPage',
     component: MyPageView
   },
   {
