@@ -10,16 +10,18 @@
           <v-row justify="center">
           <v-col class="d-flex flex-column align-center">
           <div class="text-center">
-            <v-card class="mx-auto pt-10 pb-10 rounded-xl" width="250px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToChat">
+            <v-card class="mx-auto pt-10 pb-10 rounded-xl text-h5" width="350px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToChat">
             <!-- カード内容 -->
+            <v-img src="https://i.gyazo.com/f239a716c92373dee820b967d7fa66c8.png" width="180" height="auto" class="mx-auto my-8"></v-img>
             旅行の相談をする
             </v-card>
             </div>
             </v-col>
             <v-col class="d-flex flex-column align-center">
               <div class="text-center">
-            <v-card class="mx-auto pt-10 pb-10 rounded-xl" width="250px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToBook">
+            <v-card class="mx-auto pt-10 pb-10 rounded-xl text-h5" width="350px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToBook">
             <!-- カード内容 -->
+            <v-img src="https://i.gyazo.com/5c2e8ab0ee3474729326726cd9f4571d.png" width="180" height="auto" class="mx-auto mb-8 mt-4"></v-img>
             しおりをみる
             </v-card>
           </div>

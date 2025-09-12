@@ -3,7 +3,7 @@
             <v-row justify="center">
                 <v-col class="d-flex flex-column align-center">
                     <div>
-        <v-row class="text-h4 mb-4" justify="center">チャットページ</v-row>
+        <v-row class="text-h4 mb-4" justify="center">しおりページ</v-row>
         <br>
           </div>
           </v-col> 
