@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import MyPageView from '../views/MyPageView.vue'
 import SignupView from '../views/SignupView.vue'
+import ChatView from '../views/SignupView.vue'
+import BookView from '../views/SignupView.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +24,16 @@ const routes = [
     path: '/mypage',
     name: 'MyPage',
     component: MyPageView
+  },
+  {
+    path: '/chat',
+    name: 'ChatView',
+    component: ChatView
+  },
+  {
+    path: '/book',
+    name: 'BookView',
+    component: BookView
   },
   {
     path: '/signup',
