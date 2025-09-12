@@ -47,8 +47,24 @@
         }
       },
       methods: {
-        goToChat(){
+         async goToChat(){
+          this.errorMessage = '';
+          try {
+            const result = await this.$store.dispatch('product/sessionCheck', this.$store.state.product.session);
+            
+            if (result.success){
+              console.log('ログイン成功');
+            // ログイン成功後にページ遷移
             this.$router.push('/signup');
+            }else{
+              // 失敗したらエラー表示
+              this.errorMessage = result.message;
+              this.$router.push('/login');
+            }
+          } catch (error) {
+            alert(error.response.data);
+            
+          }
           },
         goToBook(){
           this.$router.push('/signup');
