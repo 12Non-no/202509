@@ -41,7 +41,7 @@ export default {
     // setUpdatedAt(state, value){
     //     state.session.Updated_at = value;
     // },
-    // setExpiresdAt(state, value){
+    // setExpiresAt(state, value){
     //     state.session.Expires_at = value;
     // }
 
@@ -92,31 +92,26 @@ export default {
     },
     async sessionCheck ({ commit }, session) { // セッション確認&延長処理
         console.log('セッション確認を開始');
-
-        // セッションIDが存在しない場合は即エラー表示
-        if(!session.Session_id){
-            this.dialogMessage = "セッションが存在しません。";
-            this.dialog = true;
-            return;
-        }
         try{
             const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/CheckSession?';
-            const response = await axios.post(url + 'Session_id=' + session.Session_id);
+            const response = await axios.post(url + 'Session_id=' + session.Session_id, null,  { withCredentials: true });
 
+            
+            console.log("セッションチェックレスポンス:", response.data);
+            commit;
             if(response.data.status === "Success"){
-                this.snackbar = true;
                 console.log("セッションチェック成功:", response.data);
+
+                return { success: true }
         } else {
-          // セッションが無効な場合はダイアログで警告表示
-          this.dialogMessage = response.data.message;
-          this.dialog = true;
+          // セッションが無効な場合
+            console.log("セッションチェック失敗:", response.data);
+            return { success: false, message: response.data.message};
         }
             }catch (error) {
                 console.error("セッションチェックエラー:", error);
-                this.dialogMessage = "セッションの確認に失敗しました。";
-                this.dialog = true;
+                return { success: false, message: "セッションの確認に失敗しました。" };
             }
-            commit;
     }
   }
 }

@@ -53,17 +53,17 @@
             const result = await this.$store.dispatch('product/sessionCheck', this.$store.state.product.session);
             
             if (result.success){
-              console.log('ログイン成功');
+              console.log('セッション確認成功');
             // ログイン成功後にページ遷移
             this.$router.push('/signup');
             }else{
               // 失敗したらエラー表示
               this.errorMessage = result.message;
-              this.$router.push('/login');
+              this.$router.push('/');
             }
           } catch (error) {
             alert(error.response.data);
-            
+            this.$router.push('/');
           }
           },
         goToBook(){
