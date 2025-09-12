@@ -9,12 +9,11 @@ export default {
         Session_id: '',
     },
     session: {
-        Session_id:'',
-        IP_address:'',
-        Created_at:'',
-        Updated_at:'',
-        Expires_at:'',
-    }
+        Session_id:''
+    },
+    messages:[],
+    Azure_thread_id:null,
+    Assistant_id:null
   },
   getters: {
     
@@ -32,19 +31,15 @@ export default {
     setSessionId(state, value) {
         state.session.Session_id = value;
     },
-    // setIPaddress(state, value){
-    //     state.session.IP_address = value;
-    // },
-    // setCreatedAt(state, value){
-    //     state.session.Created_at = value;
-    // },
-    // setUpdatedAt(state, value){
-    //     state.session.Updated_at = value;
-    // },
-    // setExpiresAt(state, value){
-    //     state.session.Expires_at = value;
-    // }
-
+    addMessage(state, value){
+      state.messages.push(value);
+    },
+    setAzure_thread_id(state, value){
+      state.Azure_thread_id = value;
+    },
+    setAssistant_id(state, value){
+      state.Assistant_id = value;
+    }
     },
     
   actions: {
@@ -96,8 +91,6 @@ export default {
             const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/CheckSession?';
             const response = await axios.post(url + 'Session_id=' + session.Session_id, null,  { withCredentials: true });
 
-            
-            console.log("セッションチェックレスポンス:", response.data);
             commit;
             if(response.data.status === "Success"){
                 console.log("セッションチェック成功:", response.data);
@@ -112,6 +105,72 @@ export default {
                 console.error("セッションチェックエラー:", error);
                 return { success: false, message: "セッションの確認に失敗しました。" };
             }
+    },
+    async createThreadId({ commit }, {user, Azure_thread_id}){ //スレッドIDが存在するか確認&ない場合は作成処理
+      console.log('スレッドIDが存在するかの確認を開始')
+      if(Azure_thread_id == null){
+              try{
+                const url ='https://m3h-suzuki-task09.azurewebsites.net/api/Create_thread?';
+                const response = await axios.post(url + 'User_id=' + user.User_id);
+                
+                if (response.data.Result === "Succeeded") {
+                  // スレッドIDを保存
+                  commit('setAzure_thread_id', response.data.Azure_thread_id);
+        
+                  return { success: true }
+                 } else {
+                  // スレッド作成失敗
+                  return { success: false, message: response.data.Message};
+              }
+              }catch (error) {
+                console.error("スレッド作成エラー:", error);
+                return { success: false, message: error.response?.data };
+            }
+          }
+          return { success: true };
+    },
+    async Create_assistant({ commit }, {user, Assistant_id}){ //アシスタントが存在するか確認&ない場合は作成
+      console.log('アシスタント作成開始');
+      if(Assistant_id == null){
+      try{
+        const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Create_assistant?';
+        const response = await axios.post(url + 'User_id=' + user.User_id);
+
+        if(response.data.Result === "Succeeded") {
+          // アシスタントIDを保存
+          commit('setAssistant_id', response.data.Assistant_id);
+
+          return {success: true};
+        }else{
+          // アシスタントID作成失敗
+          return { success: false, message: response.data.Message};
+        }
+      } catch (error) {
+          console.error("アシスタント作成エラー:", error);
+          return { success: false, message: error.response?.data };
+      }
     }
+    return { success: true };
+  },
+  async Send_message({ commit }, {user, Azure_thread_id, message}){ //メッセージ送受信
+    console.log('アシスタントへのメッセージ送信処理開始');
+    try{
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Send_message?';
+      const response = await axios.post(url + 'User_id=' + user.User_id + '&Azure_thread_id=' + Azure_thread_id + '&message_text=' + message);
+
+      if(response.data.Result === "Succeeded") {
+          // AIの返信を保存
+          commit('setMessage', response.data.message_text);
+
+          return {success: true, aiResponse: response.data.message_text };
+        }else{
+          // メッセージ送受信失敗
+          return { success: false, message: response.data.Message};
+        }
+    }catch (error) {
+          console.error("メッセージ送信エラー:", error);
+          return { success: false, message: error.response?.data };
+      }
   }
+}
 }

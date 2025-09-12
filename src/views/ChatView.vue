@@ -1,6 +1,27 @@
 <template>
     <v-container>
-            チャットページ
+        <v-card class="mx-auto pt-10 pb-10 rounded-xl pa-4" width="700px" style="background-color: rgba(255, 255, 255, 0.6)">
+        <!-- メッセージ表示エリア -->
+            <v-card 
+			v-for="content in contents"
+			:key="content.id"
+			class="d-flex"
+		>
+        {{content.text}}
+            </v-card>
+	<!-- メッセージ入力エリア -->
+	<div class="chat-input">
+		<v-text-field 
+			v-model="newMessage"
+			type="text" 
+			name="chatText" 
+			id="chatText" 
+			class="input-control input-text" 
+			placeholder="メッセージを入力してください" 
+		/>
+    </div>
+		<v-btn @click="addToChat">送信</v-btn>
+        </v-card>
     </v-container>
 </template>
 
@@ -28,7 +49,7 @@
         }
       },
       methods: {
-         async goToChat(){
+         async addToChat(){
           this.errorMessage = '';
           try {
             const result = await this.$store.dispatch('product/sessionCheck', this.$store.state.product.session);
