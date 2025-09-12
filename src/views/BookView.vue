@@ -1,13 +1,6 @@
 <template>
     <v-container>
-            <v-row justify="center">
-                <v-col class="d-flex flex-column align-center">
-                    <div>
-        <v-row class="text-h4 mb-4" justify="center">しおりページ</v-row>
-        <br>
-          </div>
-          </v-col> 
-        </v-row>
+            しおりページ
     </v-container>
 </template>
 
