@@ -5,7 +5,7 @@
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
+      <!-- <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
           class="shrink mr-2"
@@ -34,11 +34,11 @@
       >
         <span class="mr-2">Latest Release</span>
         <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main>
-      <v-parallax src="https://i.gyazo.com/51981baf4003f7be3c81cb3ee4eb0600.jpg" cover height="700">
+      <v-parallax src="https://i.gyazo.com/51981baf4003f7be3c81cb3ee4eb0600.jpg" cover height="1300">
         <router-view/>
       </v-parallax>
     </v-main>
