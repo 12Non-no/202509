@@ -64,9 +64,9 @@ export default {
         commit('setUserName', response.data.User_name);
         
         // セッションIDがある場合はクッキーに保存
-        if (response.data.Session_id) {
-          commit('setSessionId',  response.data.Session_id);
-          console.log("セッション保存完了:", response.data.Session_id);
+        if (response.data.session_id) {
+          commit('setSessionId',  response.data.session_id);
+          console.log("セッション保存完了:", response.data.session_id);
         }
         
         return { success: true }
