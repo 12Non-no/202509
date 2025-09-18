@@ -125,42 +125,71 @@
 <script>
 export default {
   name: 'HotelView',
-  
-  data() {
-    return {
-      selectedPref: null,
-      selectedAreaData: null,
-      selectedDetailData: null,
-      checkin: '',
-      checkout: '',
-      people: 1
-    }
-  },
-  
   computed: {
     prefList() {
       return this.$store.getters['product/prefectureList'];
     },
-    
     areaList() {
-      this.$store.commit('product/setSelectedPrefecture', this.selectedPref);
       return this.$store.getters['product/areaList'];
     },
-    
     detailList() {
-      this.$store.commit('product/setSelectedArea', this.selectedAreaData);
       return this.$store.getters['product/detailList'];
     },
-    
-    showDetail() {
-      return this.detailList.length > 0;
-    },
-    
     hotels() {
       return this.$store.state.product.hotelResults;
+    },
+    selectedPref: {
+      get() {
+        return this.$store.state.product.selectedPrefecture;
+      },
+      set(value) {
+        this.$store.commit('product/setSelectedPrefecture', value);
+      }
+    },
+    selectedAreaData: {
+      get() {
+        return this.$store.state.product.selectedArea;
+      },
+      set(value) {
+        this.$store.commit('product/setSelectedArea', value);
+      }
+    },
+    selectedDetailData: {
+      get() {
+        return this.$store.state.product.selectedDetail;
+      },
+      set(value) {
+        this.$store.commit('product/setSelectedDetail', value);
+      }
+    },
+    checkin: {
+      get() {
+        return this.$store.state.product.hotelSearch.checkinDate;
+      },
+      set(value) {
+        this.$store.commit('product/setHotelSearchCheckin', value);
+      }
+    },
+    checkout: {
+      get() {
+        return this.$store.state.product.hotelSearch.checkoutDate;
+      },
+      set(value) {
+        this.$store.commit('product/setHotelSearchCheckout', value);
+      }
+    },
+    people: {
+      get() {
+        return this.$store.state.product.hotelSearch.adultNum;
+      },
+      set(value) {
+        this.$store.commit('product/setHotelSearchAdult', value);
+      }
+    },
+    showDetail() {
+      return this.detailList.length > 0;
     }
   },
-  
   mounted() {
     this.$store.dispatch('product/getRakutenAreaCode');
   },

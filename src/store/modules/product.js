@@ -205,6 +205,15 @@ export default {
     setSelectedDetail(state, detail) {
       console.log('詳細エリアを選択:', detail);
       state.selectedDetail = detail;
+    },
+    setHotelSearchCheckin(state, date) {
+      state.hotelSearch.checkinDate = date;
+    },
+    setHotelSearchCheckout(state, date) {
+      state.hotelSearch.checkoutDate = date;
+    },
+    setHotelSearchAdult(state, num) {
+      state.hotelSearch.adultNum = num;
     }
     },
     
