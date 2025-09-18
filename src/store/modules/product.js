@@ -386,32 +386,30 @@ export default {
     commit('clearAllMessages');
     return true;
   },
-  async searchHotels({ commit, state }, searchData) { // ホテル検索
-    console.log('ホテル検索開始');
-    try {
-      const url = 'https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426?';
-      const response = await axios.get(url + 
-      'applicationId=' + state.rakutenAppId +
+  async searchHotels({ commit }, searchData) {
+  console.log('ホテル検索開始');
+  try {
+    const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
+    const response = await axios.get(url + 
+      'destination=' + encodeURIComponent(searchData.destination) +
       '&checkinDate=' + searchData.checkinDate +
       '&checkoutDate=' + searchData.checkoutDate +
-      '&adultNum=' + searchData.adultNum +
-      '&keyword=' + encodeURIComponent(searchData.destination) +
-      '&format=json' +
-      '&responseType=small'
+      '&adultNum=' + searchData.adultNum
     );
 
-      console.log('ホテル検索レスポンス:', response.data);
+    console.log('ホテル検索レスポンス:', response.data);
 
-      if (response.data.hotels) {
-        commit('setHotelResults', response.data.hotels);
-        return { success: true };
-      } else {
-        return { success: false, message: 'ホテルが見つかりませんでした' };
-      }
-    } catch (error) {
-      console.error('ホテル検索エラー:', error);
-      return { success: false, message: 'ホテル検索に失敗しました' };
+    const data = JSON.parse(response.data);
+    if (data.hotels) {
+      commit('setHotelResults', data.hotels);
+      return { success: true };
+    } else {
+      return { success: false, message: 'ホテルが見つかりませんでした' };
     }
+  } catch (error) {
+    console.error('ホテル検索エラー:', error);
+    return { success: false, message: 'ホテル検索に失敗しました' };
   }
+}
   }
 }
