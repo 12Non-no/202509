@@ -1,0 +1,27 @@
+"filename", "language", "JSON with Comments", "JavaScript", "JSON", "Markdown", "YAML", "Vue", "HTML", "XML", "comment", "blank", "total"
+"c:\VueProjects\task09\.eslintrc.js", "JavaScript", 0, 17, 0, 0, 0, 0, 0, 0, 0, 1, 18
+"c:\VueProjects\task09\.github\workflows\azure-static-web-apps-blue-smoke-0ebf61700.yml", "YAML", 0, 0, 0, 0, 40, 0, 0, 0, 3, 4, 47
+"c:\VueProjects\task09\README.md", "Markdown", 0, 0, 0, 20, 0, 0, 0, 0, 0, 6, 26
+"c:\VueProjects\task09\babel.config.js", "JavaScript", 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"c:\VueProjects\task09\jsconfig.json", "JSON with Comments", 19, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20
+"c:\VueProjects\task09\package-lock.json", "JSON", 0, 0, 12630, 0, 0, 0, 0, 0, 0, 1, 12631
+"c:\VueProjects\task09\package.json", "JSON", 0, 0, 35, 0, 0, 0, 0, 0, 0, 1, 36
+"c:\VueProjects\task09\public\index.html", "HTML", 0, 0, 0, 0, 0, 0, 18, 0, 1, 1, 20
+"c:\VueProjects\task09\src\App.vue", "Vue", 0, 0, 0, 0, 0, 50, 0, 0, 1, 8, 59
+"c:\VueProjects\task09\src\assets\logo.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 2
+"c:\VueProjects\task09\src\components\HelloWorld.vue", "Vue", 0, 0, 0, 0, 0, 141, 0, 0, 0, 11, 152
+"c:\VueProjects\task09\src\main.js", "JavaScript", 0, 15, 0, 0, 0, 0, 0, 0, 0, 4, 19
+"c:\VueProjects\task09\src\plugins\vuetify.js", "JavaScript", 0, 5, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\VueProjects\task09\src\router\index.js", "JavaScript", 0, 41, 0, 0, 0, 0, 0, 0, 6, 5, 52
+"c:\VueProjects\task09\src\store\index.js", "JavaScript", 0, 17, 0, 0, 0, 0, 0, 0, 0, 3, 20
+"c:\VueProjects\task09\src\store\modules\product.js", "JavaScript", 0, 220, 0, 0, 0, 0, 0, 0, 12, 28, 260
+"c:\VueProjects\task09\src\views\AboutView.vue", "Vue", 0, 0, 0, 0, 0, 5, 0, 0, 0, 1, 6
+"c:\VueProjects\task09\src\views\ChatView.vue", "Vue", 0, 0, 0, 0, 0, 130, 0, 0, 2, 10, 142
+"c:\VueProjects\task09\src\views\HomeView.vue", "Vue", 0, 0, 0, 0, 0, 12, 0, 0, 0, 4, 16
+"c:\VueProjects\task09\src\views\LoginView.vue", "Vue", 0, 0, 0, 0, 0, 83, 0, 0, 2, 8, 93
+"c:\VueProjects\task09\src\views\MyPageView.vue", "Vue", 0, 0, 0, 0, 0, 91, 0, 0, 6, 8, 105
+"c:\VueProjects\task09\src\views\PlanView.vue", "Vue", 0, 0, 0, 0, 0, 108, 0, 0, 2, 5, 115
+"c:\VueProjects\task09\src\views\SignupView.vue", "Vue", 0, 0, 0, 0, 0, 78, 0, 0, 1, 1, 80
+"c:\VueProjects\task09\staticwebapp.config.json", "JSON", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5
+"c:\VueProjects\task09\vue.config.js", "JavaScript", 0, 6, 0, 0, 0, 0, 0, 0, 0, 1, 7
+"Total", "-", 19, 326, 12670, 20, 40, 698, 18, 1, 36, 117, 13945

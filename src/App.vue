@@ -1,46 +1,37 @@
 <template>
-  <v-app>
+  <v-app style="background-image: url('https://i.gyazo.com/51981baf4003f7be3c81cb3ee4eb0600.jpg'); background-size: cover; background-position: center;">
     <v-app-bar
       app
-      color="primary"
+      color="rgba(255, 255, 255, 0.6)"
       dark
     >
-      <!-- <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
+      
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn> -->
+      <!-- ログイン済みの場合 -->
+      <template v-if="isLoggedIn">
+        <v-btn color="white" @click="goToMyPage" class="black--text mr-4">
+          <v-icon>mdi-home</v-icon>
+          マイページ
+        </v-btn>
+        
+        <v-btn color="white" @click="logout" class="black--text">
+          <v-icon>mdi-logout</v-icon>
+          ログアウト
+        </v-btn>
+      </template>
+      
+      <!-- 未ログインの場合 -->
+      <template v-else>
+        <v-btn color="white" @click="goToLogin" class="black--text">
+          <v-icon>mdi-login</v-icon>
+          ログイン
+        </v-btn>
+      </template>
     </v-app-bar>
 
     <v-main>
-      <v-parallax src="https://i.gyazo.com/51981baf4003f7be3c81cb3ee4eb0600.jpg" cover height="1300">
         <router-view/>
-      </v-parallax>
     </v-main>
   </v-app>
 </template>
@@ -53,5 +44,26 @@ export default {
   data: () => ({
     //
   }),
+  computed: {
+    isLoggedIn() {
+      // セッションIDの有無でログイン状態を判定
+      return !!this.$store.state.product.session.Session_id;
+    }
+  },
+  methods: {
+    goToMyPage() {
+      this.$router.push('/mypage');
+    },
+    
+    goToLogin() {
+      this.$router.push('/');
+    },
+    
+    logout() {
+      this.$store.commit('product/setSessionId', '');
+      this.$store.commit('product/setUserName', '');
+      this.$router.push('/');
+    }
+  }
 };
 </script>

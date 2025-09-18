@@ -7,13 +7,49 @@ export default {
         User_name:'',
         Password:'',
         Session_id: '',
+        Chat_id: '',
+        Azure_thread_id: '',
+    },
+    plan: {
+      Start_date:'',
+      End_date:'',
+      Destination:'',
+      Transportation:'',
+      Accommodation:'',
+      Budget:'',
+      Members:'',
+      Purpose:'',
+      Tourist_spots:''
+    },
+    ui: {
+      showAlert: false,
+      alertMessage: '',
+      alertType: 'info',
+      showSnackbar: false,
+      snackbarMessage: '',
+      snackbarColor: 'success'
     },
     session: {
         Session_id:''
     },
     messages:[],
-    Azure_thread_id:null,
-    Assistant_id:null
+    currentMessage:'',
+    Assistant_id:null,
+    transportationList:[
+      '新幹線',
+      '飛行機',
+      '自動車',
+      'その他'
+    ],
+    hotelSearch: {
+      destination: '',
+      checkinDate: '',
+      checkoutDate: '',
+      adultNum: 1,
+      childNum: 0
+    },
+    hotelResults: [],
+    rakutenAppId: '1090201424106989371'
   },
   getters: {
     
@@ -31,14 +67,70 @@ export default {
     setSessionId(state, value) {
         state.session.Session_id = value;
     },
-    addMessage(state, value){
-      state.messages.push(value);
+    addMessage(state, messageData) {
+      state.messages.push({
+        id: Date.now(),
+        userMessage: messageData.userMessage,
+        aiResponse: messageData.aiResponse,
+        timestamp: messageData.timestamp
+      });
     },
     setAzure_thread_id(state, value){
       state.Azure_thread_id = value;
     },
     setAssistant_id(state, value){
       state.Assistant_id = value;
+    },
+    setChatData(state, data){
+      state.user.Azure_thread_id = data.Azure_thread_id;
+      state.user.Chat_id = data.Chat_id;
+    },
+    clearMessages(state) {
+      state.messages = [];
+    },
+    setCurrentMessage(state, message) {
+      state.currentMessage = message;
+    },
+    setPlan(state, plan){
+      state.plan.Start_date = plan.Start_date;
+      state.plan.End_date = plan.End_date;
+      state.plan.Destination = plan.Destination;
+      state.plan.Transportation = plan.Transportation;
+      state.plan.Accommodation = plan.Accommodation;
+      state.plan.Budget = plan.Budget;
+      state.plan.Members = plan.Members;
+      state.plan.Purpose = plan.Purpose;
+      state.plan.Tourist_spots = plan.Tourist_spots;
+    },
+    setAlertShow(state, value) {
+        state.ui.showAlert = value;
+    },
+    setAlertMessage(state, message) {
+        state.ui.alertMessage = message;
+    },
+    setAlertType(state, type) {
+        state.ui.alertType = type;
+    },
+    setSnackbarShow(state, value) {
+        state.ui.showSnackbar = value;
+    },
+    setSnackbarMessage(state, message) {
+        state.ui.snackbarMessage = message;
+    },
+    setSnackbarColor(state, color) {
+        state.ui.snackbarColor = color;
+    },
+    clearAllMessages(state) {
+        state.ui.showAlert = false;
+        state.ui.alertMessage = '';
+        state.ui.showSnackbar = false;
+        state.ui.snackbarMessage = '';
+    },
+    setHotelSearch(state, data) {
+      state.hotelSearch = data;
+    },
+    setHotelResults(state, results) {
+      state.hotelResults = results;
     }
     },
     
@@ -56,7 +148,7 @@ export default {
       if (response.data.result === "Succeeded") {
         
         // ユーザー名を保存
-        commit('setUserName', response.data.User_name);
+        commit('setUserName', response.data.user_name);
         
         // セッションIDがある場合はクッキーに保存
         if (response.data.session_id) {
@@ -79,11 +171,24 @@ export default {
   },
     async signup ({ commit }, userData) { // 会員登録処理
         console.log('新規会員登録を開始');
+        try{
             const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Insert_user?';
-            const response = await axios.post(url + 'User_id=' + userData.User_id + '&User_name=' + encodeURIComponent(userData.User_name) + '&PasswordHash=' + userData.Password);
+            const response = await axios.post(url + 
+              'User_id=' + userData.User_id + 
+              '&User_name=' + encodeURIComponent(userData.User_name) + 
+              '&PasswordHash=' + userData.Password
+            );
 
             commit;
             return response.data;
+        } catch (error) {
+          console.error('新規登録エラー:', error);
+        
+        return {
+            Result: "Failed",
+            Message: error.response?.data
+        };
+        }
     },
     async sessionCheck ({ commit }, session) { // セッション確認&延長処理
         console.log('セッション確認を開始');
@@ -106,9 +211,9 @@ export default {
                 return { success: false, message: "セッションの確認に失敗しました。" };
             }
     },
-    async createThreadId({ commit }, {user, Azure_thread_id}){ //スレッドIDが存在するか確認&ない場合は作成処理
+    async createThreadId({ commit }, user){ //スレッドIDが存在するか確認&ない場合は作成処理
       console.log('スレッドIDが存在するかの確認を開始')
-      if(Azure_thread_id == null){
+      if(user.Azure_thread_id == null){
               try{
                 const url ='https://m3h-suzuki-task09.azurewebsites.net/api/Create_thread?';
                 const response = await axios.post(url + 'User_id=' + user.User_id);
@@ -130,20 +235,23 @@ export default {
           return { success: true };
     },
     async Create_assistant({ commit }, {user, Assistant_id}){ //アシスタントが存在するか確認&ない場合は作成
-      console.log('アシスタント作成開始');
+      console.log('アシスタント作成開始');  
+      
       if(Assistant_id == null){
+        console.log('アシスタント作成APIを呼び出します');
       try{
         const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Create_assistant?';
-        const response = await axios.post(url + 'User_id=' + user.User_id);
+      
+      const response = await axios.post(url + 'User_id=' + user.User_id);
 
-        if(response.data.Result === "Succeeded") {
+        if(response.data.result === "Succeeded") {
           // アシスタントIDを保存
-          commit('setAssistant_id', response.data.Assistant_id);
+          commit('setAssistant_id', response.data.assistant_id);
 
           return {success: true};
         }else{
           // アシスタントID作成失敗
-          return { success: false, message: response.data.Message};
+          return { success: false, message: response.data.message};
         }
       } catch (error) {
           console.error("アシスタント作成エラー:", error);
@@ -152,15 +260,25 @@ export default {
     }
     return { success: true };
   },
-  async Send_message({ commit }, {user, Azure_thread_id, message}){ //メッセージ送受信
+  async Send_message({ commit }, {user, message}){ //メッセージ送受信
     console.log('アシスタントへのメッセージ送信処理開始');
+
+    const Azure_thread_id = user.Azure_thread_id;
+
+ console.log('送信するuser:', user);
+  console.log('送信するmessage:', message);
+  console.log('user.User_id:', user?.User_id);
+  console.log('user.Azure_thread_id:', Azure_thread_id);
+
     try{
       const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Send_message?';
+      
       const response = await axios.post(url + 'User_id=' + user.User_id + '&Azure_thread_id=' + Azure_thread_id + '&message_text=' + message);
 
-      if(response.data.Result === "Succeeded") {
-          // AIの返信を保存
-          commit('setMessage', response.data.message_text);
+      if(response.data.result === "Succeeded") {
+        console.log('メッセージ送信成功');  
+        // AIの返信を保存
+          commit('addMessage', {userMessage:message, aiResponse:response.data.message_text, timestamp:new Date()});
 
           return {success: true, aiResponse: response.data.message_text };
         }else{
@@ -169,8 +287,133 @@ export default {
         }
     }catch (error) {
           console.error("メッセージ送信エラー:", error);
-          return { success: false, message: error.response?.data };
+          return { success: false, message: error.response?.data?.message || error.message};
       }
+  },
+  async getChat({commit}, user){ //チャット履歴取得orチャット作成
+    console.log('チャット情報取得開始');
+    try{
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/History_chat?';
+      const response = await axios.post(url + 'User_id=' + user.User_id);
+
+      if(response.data.result === "Succeeded" ){
+        commit('setChatData', {Azure_thread_id: response.data.azure_thread_id,  
+        Chat_id: response.data.chat_id});
+        return {success: true};
+      }else{
+        return { success: false, message: response.data.Message};
+      }
+    } catch (error) {
+        console.error("アシスタント作成エラー:", error);
+        return { success: false, message: error.response?.data };
+    }
+  },
+  async insertPlan({commit}, {plan, user}){ //プラン登録
+    console.log('プラン登録開始');
+    try{
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Insert_plan?';
+      const response = await axios.post(url + 
+        'User_id=' + user.User_id + 
+        '&Chat_id=' + user.Chat_id + 
+        '&Start_date=' + plan.Start_date + 
+        '&End_date=' + plan.End_date + 
+        '&Destination=' + encodeURIComponent(plan.Destination) +
+        '&Transportation=' + encodeURIComponent(plan.Transportation) +
+        '&Accommodation=' + encodeURIComponent(plan.Accommodation) +
+        '&Budget=' + plan.Budget + 
+        '&Members=' + plan.Members +
+        '&Purpose=' + encodeURIComponent(plan.Purpose) +
+        '&Tourist_spots=' + encodeURIComponent(plan.Tourist_spots)
+      );
+
+      if(response.data.result === "Succeeded" ){
+        commit('setPlan', plan);
+        return {success: true};
+      }else{
+        return { success: false, message: response.data.Message};
+      }
+    } catch (error) {
+        console.error("プラン登録エラー:", error);
+        return { success: false, message: error.response?.data };
+    }
+  },
+  validatePlan({ commit, state }) { // プラン登録時の未入力チェック
+    const plan = state.plan;
+  
+    if (!plan.Start_date) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', '出発日は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+    if (!plan.End_date) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', '帰着日は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+    if (!plan.Destination) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', '旅行先は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+  
+    commit('clearAllMessages');
+    return true;
+  },
+  validateHotelSearch({ commit, state }) {
+    const search = state.hotelSearch;
+
+    if (!search.destination) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', '目的地は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+    if (!search.checkinDate) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', 'チェックイン日は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+    if (!search.checkoutDate) {
+      commit('setAlertShow', true);
+      commit('setAlertMessage', 'チェックアウト日は必須です');
+      commit('setAlertType', 'error');
+      return false;
+    }
+
+    commit('clearAllMessages');
+    return true;
+  },
+  async searchHotels({ commit, state }, searchData) { // ホテル検索
+    console.log('ホテル検索開始');
+    try {
+      const url = 'https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426?';
+      const response = await axios.get(url + 
+        'applicationId=' + state.rakutenAppId +
+        '&largeClassCode=japan' +
+        '&checkinDate=' + searchData.checkinDate +
+        '&checkoutDate=' + searchData.checkoutDate +
+        '&adultNum=' + searchData.adultNum +
+        '&childNum=' + searchData.childNum +
+        '&keyword=' + encodeURIComponent(searchData.destination) +
+        '&format=json'
+      );
+
+      console.log('ホテル検索レスポンス:', response.data);
+
+      if (response.data.hotels) {
+        commit('setHotelResults', response.data.hotels);
+        return { success: true };
+      } else {
+        return { success: false, message: 'ホテルが見つかりませんでした' };
+      }
+    } catch (error) {
+      console.error('ホテル検索エラー:', error);
+      return { success: false, message: 'ホテル検索に失敗しました' };
+    }
   }
-}
+  }
 }

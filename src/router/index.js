@@ -5,7 +5,8 @@ import LoginView from '../views/LoginView.vue'
 import MyPageView from '../views/MyPageView.vue'
 import SignupView from '../views/SignupView.vue'
 import ChatView from '../views/ChatView.vue'
-import BookView from '../views/BookView.vue'
+import PlanView from '../views/PlanView.vue'
+import HotelSearchView from '../views/HotelSearchView.vue'
 
 Vue.use(VueRouter)
 
@@ -31,14 +32,19 @@ const routes = [
     component: ChatView
   },
   {
-    path: '/book',
-    name: 'BookView',
-    component: BookView
+    path: '/plan',
+    name: 'PlanView',
+    component: PlanView
   },
   {
     path: '/signup',
     name: 'signup',
     component: SignupView
+  },
+  {
+    path: '/hotel',
+    name: 'hotel',
+    component: HotelSearchView
   }
 ]
 
