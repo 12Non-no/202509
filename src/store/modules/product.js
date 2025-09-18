@@ -387,29 +387,29 @@ export default {
     return true;
   },
   async searchHotels({ commit }, searchData) {
-  console.log('ホテル検索開始');
-  try {
-    const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
-    const response = await axios.get(url + 
-      'destination=' + encodeURIComponent(searchData.destination) +
-      '&checkinDate=' + searchData.checkinDate +
-      '&checkoutDate=' + searchData.checkoutDate +
-      '&adultNum=' + searchData.adultNum
-    );
+    console.log('ホテル検索開始');
+    try {
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
+      const response = await axios.get(url + 
+        'destination=' + encodeURIComponent(searchData.destination) +
+        '&checkinDate=' + searchData.checkinDate +
+        '&checkoutDate=' + searchData.checkoutDate +
+        '&adultNum=' + searchData.adultNum
+      );
 
-    console.log('ホテル検索レスポンス:', response.data);
+      console.log('ホテル検索レスポンス:', response.data);
 
-    const data = JSON.parse(response.data);
-    if (data.hotels) {
-      commit('setHotelResults', data.hotels);
-      return { success: true };
-    } else {
-      return { success: false, message: 'ホテルが見つかりませんでした' };
+      const data = JSON.parse(response.data);
+      if (data.hotels) {
+        commit('setHotelResults', data.hotels);
+        return { success: true };
+      } else {
+        return { success: false, message: 'ホテルが見つかりませんでした' };
+      }
+    } catch (error) {
+      console.error('ホテル検索エラー:', error);
+      return { success: false, message: 'ホテル検索に失敗しました' };
     }
-  } catch (error) {
-    console.error('ホテル検索エラー:', error);
-    return { success: false, message: 'ホテル検索に失敗しました' };
   }
-}
   }
 }
