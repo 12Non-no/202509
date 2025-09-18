@@ -399,7 +399,7 @@ export default {
 
     console.log('ホテル検索レスポンス:', response.data);
 
-    if (response.data.Result === "Succeeded") {
+    if (response.data.result === "Succeeded") {
       const data = JSON.parse(response.data.Data);
       if (data.hotels && data.hotels.length > 0) {
         commit('setHotelResults', data.hotels);
