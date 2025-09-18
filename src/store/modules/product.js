@@ -48,10 +48,66 @@ export default {
       adultNum: 1
     },
     hotelResults: [],
-    rakutenAppId: '1090201424106989371'
+    rakutenAppId: '1090201424106989371',
+    rakutenAreaCodes: [],
+    selectedPrefecture: null,
+    selectedArea: null,
+    selectedDetail: null
   },
   getters: {
-    
+    prefectureList(state) {
+    if (!state.rakutenAreaCodes || state.rakutenAreaCodes.length === 0) {
+      return [];
+    }
+    const list = [];
+    for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
+      const pref = state.rakutenAreaCodes[i];
+      list.push({
+        text: pref.middleClass.middleClassName,
+        value: pref.middleClass.middleClassCode
+      });
+    }
+    return list;
+  },
+  areaList(state) {
+    if (!state.selectedPrefecture) {
+      return [];
+    }
+    const areas = [];
+    for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
+      const pref = state.rakutenAreaCodes[i];
+      if (pref.middleClass.middleClassCode === state.selectedPrefecture.value) {
+        if (pref.smallClasses) {
+          for (let j = 0; j < pref.smallClasses.length; j++) {
+            const area = pref.smallClasses[j];
+            areas.push({
+              text: area.smallClass.smallClassName,
+              value: area.smallClass.smallClassCode
+            });
+          }
+        }
+        break;
+      }
+    }
+    return areas;
+  },
+  detailList(state) {
+    if (state.selectedPrefecture && state.selectedPrefecture.value === 'tokyo' &&
+        state.selectedArea && state.selectedArea.value === 'tokyo') {
+      return [
+        { text: '東京駅・銀座・秋葉原・東陽町・葛西', value: 'A' },
+        { text: '新橋・汐留・浜松町・お台場', value: 'B' },
+        { text: '赤坂・六本木・霞ヶ関・永田町', value: 'C' },
+        { text: '渋谷・恵比寿・目黒・二子玉川', value: 'D' },
+        { text: '品川・大井町・蒲田・羽田空港', value: 'E' },
+        { text: '新宿・中野・荻窪・四谷', value: 'F' },
+        { text: '池袋・赤羽・巣鴨・大塚', value: 'G' },
+        { text: '東京ドーム・飯田橋・御茶ノ水', value: 'H' },
+        { text: '上野・浅草・錦糸町・新小岩・北千住', value: 'I' }
+      ];
+    }
+    return [];
+  }
   },
   mutations: {
     setUserId(state, value){
@@ -130,6 +186,25 @@ export default {
     },
     setHotelResults(state, results) {
       state.hotelResults = results;
+    },
+    setRakutenAreaCode(state, areaCodes) {
+      console.log('地区コードを保存します');
+      state.rakutenAreaCodes = areaCodes;
+    },
+    setSelectedPrefecture(state, prefecture) {
+      console.log('都道府県を選択:', prefecture);
+      state.selectedPrefecture = prefecture;
+      state.selectedArea = null;
+      state.selectedDetail = null;
+    },
+    setSelectedArea(state, area) {
+      console.log('エリアを選択:', area);
+      state.selectedArea = area;
+      state.selectedDetail = null;
+    },
+    setSelectedDetail(state, detail) {
+      console.log('詳細エリアを選択:', detail);
+      state.selectedDetail = detail;
     }
     },
     
@@ -386,65 +461,85 @@ export default {
     commit('clearAllMessages');
     return true;
   },
-  async searchHotels({ commit }, searchData) {
-  console.log('ホテル検索開始');
-  try {
-    // APIを呼び出す
-    const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
-    const response = await axios.get(url + 
-      'destination=' + encodeURIComponent(searchData.destination) +
-      '&checkinDate=' + searchData.checkinDate +
-      '&checkoutDate=' + searchData.checkoutDate +
-      '&adultNum=' + searchData.adultNum
-    );
-
-    console.log('ホテル検索レスポンス:', response.data);
-
-    // 成功したかチェック
-    if (response.data.result === "Succeeded") {
-      const dataStr = response.data.data;
-      const data = JSON.parse(dataStr);
-      console.log('取得したデータ:', data);
+  async getRakutenAreaCode({ commit }) {
+    console.log('地区コードを取得します');
+    try {
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Get_area_codes';
+      const response = await axios.get(url);
       
-      // ホテルがあるかチェック
-      if (data.hotels && data.hotels.length > 0) {
-        // ホテルリストを作る
-        const hotelList = [];
-        
-        // 一つずつホテルを処理する
-        for (let i = 0; i < data.hotels.length; i++) {
-          const hotel = data.hotels[i].hotel[0].hotelBasicInfo;
-          
-          // 必要なデータだけ取り出す
-          const simpleHotel = {
-            hotelNo: hotel.hotelNo,
-            hotelName: hotel.hotelName,
-            hotelMinCharge: hotel.hotelMinCharge,
-            hotelImageUrl: hotel.hotelImageUrl,
-            hotelInformationUrl: hotel.hotelInformationUrl,
-            access: hotel.access,
-            reviewAverage: hotel.reviewAverage,
-            hotelSpecial: hotel.hotelSpecial
-          };
-          
-          hotelList.push(simpleHotel);
-        }
-        
-        console.log('整理したホテルリスト:', hotelList);
-        
-        // ストアに保存
-        commit('setHotelResults', hotelList);
-        return { success: true, message: hotelList.length + '件のホテルが見つかりました' };
-      } else {
-        return { success: false, message: 'ホテルが見つかりませんでした' };
+      if (response.data.Status === "Success") {
+        const data = JSON.parse(response.data.Data);
+        console.log('地区コード取得成功');
+        commit('setRakutenAreaCode', data.areaClasses.largeClasses[0].middleClasses);
       }
-    } else {
-      return { success: false, message: 'API呼び出しに失敗しました' };
+    } catch(error) {
+      console.error("エラーが発生しました:", error);
     }
-  } catch (error) {
-    console.error('エラーが発生しました:', error);
-    return { success: false, message: 'ホテル検索に失敗しました' };
+  },
+  async searchHotels({ commit }, searchData) {
+    console.log('ホテル検索を開始します');
+    try {
+      // URLを作る
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
+      let params = 'prefectureCode=' + searchData.prefectureCode +
+                   '&areaCode=' + searchData.areaCode +
+                   '&checkinDate=' + searchData.checkinDate +
+                   '&checkoutDate=' + searchData.checkoutDate +
+                   '&adultNum=' + searchData.adultNum;
+      
+      // 詳細コードがある場合は追加
+      if (searchData.detailCode) {
+        params += '&detailCode=' + searchData.detailCode;
+      }
+      
+      // APIを呼び出す
+      const response = await axios.get(url + params);
+      console.log('API結果:', response.data);
+
+      // 成功したかチェック
+      if (response.data.result === "Succeeded") {
+        const data = JSON.parse(response.data.data);
+        console.log('ホテルデータ:', data);
+        
+        // ホテルがあるかチェック
+        if (data.hotels && data.hotels.length > 0) {
+          // ホテルリストを作る
+          const hotelList = [];
+          
+          // 一つずつ処理
+          for (let i = 0; i < data.hotels.length; i++) {
+            const hotel = data.hotels[i].hotel[0].hotelBasicInfo;
+            
+            // 簡単なホテルデータを作る
+            const simpleHotel = {
+              hotelNo: hotel.hotelNo,
+              hotelName: hotel.hotelName,
+              hotelMinCharge: hotel.hotelMinCharge,
+              hotelImageUrl: hotel.hotelImageUrl,
+              hotelInformationUrl: hotel.hotelInformationUrl,
+              access: hotel.access,
+              reviewAverage: hotel.reviewAverage,
+              hotelSpecial: hotel.hotelSpecial
+            };
+            
+            hotelList.push(simpleHotel);
+          }
+          
+          console.log('ホテル一覧完成:', hotelList.length + '件');
+          
+          // 結果を保存
+          commit('setHotelResults', hotelList);
+          return { success: true, message: hotelList.length + '件見つかりました' };
+        } else {
+          return { success: false, message: 'ホテルが見つかりませんでした' };
+        }
+      } else {
+        return { success: false, message: '検索に失敗しました' };
+      }
+    } catch (error) {
+      console.error('検索エラー:', error);
+      return { success: false, message: '検索でエラーが発生しました' };
+    }
   }
-}
   }
 }
