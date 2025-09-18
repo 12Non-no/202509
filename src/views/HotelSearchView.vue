@@ -46,30 +46,16 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
               <!-- 人数 -->
-              <v-col cols="6">
               <v-text-field
                 v-model="hotelSearch.adultNum"
-                label="大人の人数 *"
+                label="人数 *"
                 type="number"
                 outlined
                 required
                 min="1"
                 max="10"
               />
-              </v-col>
-              <v-col cols="6">
-              <v-text-field
-                v-model="hotelSearch.childNum"
-                label="子供の人数"
-                type="number"
-                outlined
-                min="0"
-                max="10"
-              />
-              </v-col>
-              </v-row>
             </div>
 
             <div>

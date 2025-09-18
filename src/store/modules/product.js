@@ -45,8 +45,7 @@ export default {
       destination: '',
       checkinDate: '',
       checkoutDate: '',
-      adultNum: 1,
-      childNum: 0
+      adultNum: 1
     },
     hotelResults: [],
     rakutenAppId: '1090201424106989371'
@@ -392,15 +391,14 @@ export default {
     try {
       const url = 'https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426?';
       const response = await axios.get(url + 
-        'applicationId=' + state.rakutenAppId +
-        '&largeClassCode=japan' +
-        '&checkinDate=' + searchData.checkinDate +
-        '&checkoutDate=' + searchData.checkoutDate +
-        '&adultNum=' + searchData.adultNum +
-        '&childNum=' + searchData.childNum +
-        '&keyword=' + encodeURIComponent(searchData.destination) +
-        '&format=json'
-      );
+      'applicationId=' + state.rakutenAppId +
+      '&checkinDate=' + searchData.checkinDate +
+      '&checkoutDate=' + searchData.checkoutDate +
+      '&adultNum=' + searchData.adultNum +
+      '&keyword=' + encodeURIComponent(searchData.destination) +
+      '&format=json' +
+      '&responseType=small'
+    );
 
       console.log('ホテル検索レスポンス:', response.data);
 
