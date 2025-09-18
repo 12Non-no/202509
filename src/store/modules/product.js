@@ -399,8 +399,24 @@ export default {
 
     console.log('ホテル検索レスポンス:', response.data);
 
+    // デバッグ用：レスポンス構造を確認
+    console.log('result:', response.data.result);
+    console.log('Result:', response.data.Result);
+    console.log('data:', response.data.data);
+    console.log('Data:', response.data.Data);
+
+    // 小文字のresult, dataを使用（実際の構造に合わせる）
     if (response.data.result === "Succeeded") {
-      const data = JSON.parse(response.data.Data);
+      const dataStr = response.data.data;
+      
+      if (!dataStr) {
+        console.error('データが空です:', dataStr);
+        return { success: false, message: 'レスポンスデータが空です' };
+      }
+      
+      const data = JSON.parse(dataStr);
+      console.log('パース後のデータ:', data);
+      
       if (data.hotels && data.hotels.length > 0) {
         commit('setHotelResults', data.hotels);
         return { success: true, message: `${data.hotels.length}件のホテルが見つかりました` };
@@ -412,6 +428,7 @@ export default {
     }
   } catch (error) {
     console.error('ホテル検索エラー:', error);
+    console.error('エラーレスポンス:', error.response?.data);
     return { success: false, message: 'ホテル検索に失敗しました' };
   }
 }
