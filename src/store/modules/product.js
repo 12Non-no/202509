@@ -389,6 +389,7 @@ export default {
   async searchHotels({ commit }, searchData) {
   console.log('ホテル検索開始');
   try {
+    // APIを呼び出す
     const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
     const response = await axios.get(url + 
       'destination=' + encodeURIComponent(searchData.destination) +
@@ -399,27 +400,41 @@ export default {
 
     console.log('ホテル検索レスポンス:', response.data);
 
-    // デバッグ用：レスポンス構造を確認
-    console.log('result:', response.data.result);
-    console.log('Result:', response.data.Result);
-    console.log('data:', response.data.data);
-    console.log('Data:', response.data.Data);
-
-    // 小文字のresult, dataを使用（実際の構造に合わせる）
+    // 成功したかチェック
     if (response.data.result === "Succeeded") {
       const dataStr = response.data.data;
-      
-      if (!dataStr) {
-        console.error('データが空です:', dataStr);
-        return { success: false, message: 'レスポンスデータが空です' };
-      }
-      
       const data = JSON.parse(dataStr);
-      console.log('パース後のデータ:', data);
+      console.log('取得したデータ:', data);
       
+      // ホテルがあるかチェック
       if (data.hotels && data.hotels.length > 0) {
-        commit('setHotelResults', data.hotels);
-        return { success: true, message: `${data.hotels.length}件のホテルが見つかりました` };
+        // ホテルリストを作る
+        const hotelList = [];
+        
+        // 一つずつホテルを処理する
+        for (let i = 0; i < data.hotels.length; i++) {
+          const hotel = data.hotels[i].hotel[0].hotelBasicInfo;
+          
+          // 必要なデータだけ取り出す
+          const simpleHotel = {
+            hotelNo: hotel.hotelNo,
+            hotelName: hotel.hotelName,
+            hotelMinCharge: hotel.hotelMinCharge,
+            hotelImageUrl: hotel.hotelImageUrl,
+            hotelInformationUrl: hotel.hotelInformationUrl,
+            access: hotel.access,
+            reviewAverage: hotel.reviewAverage,
+            hotelSpecial: hotel.hotelSpecial
+          };
+          
+          hotelList.push(simpleHotel);
+        }
+        
+        console.log('整理したホテルリスト:', hotelList);
+        
+        // ストアに保存
+        commit('setHotelResults', hotelList);
+        return { success: true, message: hotelList.length + '件のホテルが見つかりました' };
       } else {
         return { success: false, message: 'ホテルが見つかりませんでした' };
       }
@@ -427,8 +442,7 @@ export default {
       return { success: false, message: 'API呼び出しに失敗しました' };
     }
   } catch (error) {
-    console.error('ホテル検索エラー:', error);
-    console.error('エラーレスポンス:', error.response?.data);
+    console.error('エラーが発生しました:', error);
     return { success: false, message: 'ホテル検索に失敗しました' };
   }
 }
