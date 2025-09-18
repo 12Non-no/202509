@@ -401,9 +401,9 @@ export default {
 
     if (response.data.Result === "Succeeded") {
       const data = JSON.parse(response.data.Data);
-      if (data.hotels) {
+      if (data.hotels && data.hotels.length > 0) {
         commit('setHotelResults', data.hotels);
-        return { success: true };
+        return { success: true, message: `${data.hotels.length}件のホテルが見つかりました` };
       } else {
         return { success: false, message: 'ホテルが見つかりませんでした' };
       }
