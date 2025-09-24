@@ -125,6 +125,13 @@
 <script>
 export default {
   name: 'HotelView',
+  // watchを追加
+  watch: {
+    selectedPref(newVal, oldVal) {
+      console.log('selectedPref changed:', oldVal, '=>', newVal);
+      console.log('新しいareaList:', this.areaList);
+    }
+  },
   computed: {
     prefList() {
       // デバッグ用: 都道府県リストの内容を確認
