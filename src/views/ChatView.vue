@@ -61,7 +61,7 @@
             />
           </v-col>
           <v-col cols="2">
-            <v-btn @click="addToChat" color="pink" block large>
+            <v-btn @click="addToChat" color="#90CAF9" block large>
               送信
             </v-btn>
           </v-col>

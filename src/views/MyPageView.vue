@@ -36,12 +36,23 @@
               </v-card>
             </div>
           </v-col>
+        </v-row>
+        <v-row justify="center">
           <v-col class="d-flex flex-column align-center">
             <div class="text-center">
               <v-card class="mx-auto pt-10 pb-10 rounded-xl text-h5" width="350px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToPlan">
               <!-- カード内容 -->
                 <v-img src="https://i.gyazo.com/5c2e8ab0ee3474729326726cd9f4571d.png" width="180" height="120" contain class="mx-auto my-8"></v-img>
                 旅行プランを登録する
+              </v-card>
+            </div>
+          </v-col>
+          <v-col class="d-flex flex-column align-center">
+            <div class="text-center">
+              <v-card class="mx-auto pt-10 pb-10 rounded-xl text-h5" width="350px" style="background-color: rgba(255, 255, 255, 0.6)" @click="goToAllPlan">
+              <!-- カード内容 -->
+                <v-img src="https://i.gyazo.com/dd6a5b72fd59795707cd8ad5ff6e4b01.png" width="180" height="120" contain class="mx-auto my-8"></v-img>
+                旅行プランを確認する
               </v-card>
             </div>
           </v-col>
@@ -131,6 +142,31 @@
               console.log('セッション確認成功');
               // セッション確認成功後に旅行プラン登録ページへ遷移
               this.$router.push('/plan');
+            }else{
+              // 失敗したらエラー表示
+              this.$store.commit('product/setAlertShow', true);
+              this.$store.commit('product/setAlertMessage', result.message);
+              this.$store.commit('product/setAlertType', 'error');
+              this.$router.push('/');
+            }
+          } catch (error) {
+            console.error('goToPlan エラー:', error);
+            this.$store.commit('product/setAlertShow', true);
+            this.$store.commit('product/setAlertMessage', 'システムエラーが発生しました。');
+            this.$store.commit('product/setAlertType', 'error');
+            this.$router.push('/');
+          }
+        },
+        async goToAllPlan(){
+          this.$store.commit('product/clearAllMessages'); // メッセージクリア
+          try {
+            const result = await this.$store.dispatch('product/sessionCheck', this.$store.state.product.session);
+            
+            if (result.success){
+              console.log('セッション確認成功');
+              // セッション確認成功後に旅行プラン確認ページへ遷移
+              this.$store.dispatch('product/getAllPlans', this.$store.state.product.user);
+              this.$router.push('/allplan');
             }else{
               // 失敗したらエラー表示
               this.$store.commit('product/setAlertShow', true);

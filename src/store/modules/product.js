@@ -10,7 +10,9 @@ export default {
         Chat_id: '',
         Azure_thread_id: '',
     },
+    planData: [], // プラン一覧
     plan: {
+      Plan_id: null,
       Start_date:'',
       End_date:'',
       Destination:'',
@@ -21,6 +23,40 @@ export default {
       Purpose:'',
       Tourist_spots:''
     },
+    planHeaders: [// プラン一覧用ヘッダー
+      {
+        text: '旅行先',
+        value: 'Destination',
+        width: "20%"
+      },
+      {
+        text: '旅行期間',
+        value: 'period',
+        width: "25%",
+        sortable: false
+      },
+      {
+        text: '交通手段',
+        value: 'Transportation',
+        width: "15%"
+      },
+      {
+        text: '参加人数',
+        value: 'Members',
+        width: "10%"
+      },
+      {
+        text: '予算',
+        value: 'Budget',
+        width: "15%"
+      },
+      {
+        text: '詳細',
+        value: 'details',
+        width: "5%",
+        sortable: false
+      }
+    ],
     ui: {
       showAlert: false,
       alertMessage: '',
@@ -55,6 +91,8 @@ export default {
     selectedDetail: null
   },
   getters: {
+    planData: state => state.planData,
+    planHeaders: state => state.planHeaders,
     prefectureList(state) {
     if (!state.rakutenAreaCodes || state.rakutenAreaCodes.length === 0) {
       return [];
@@ -176,6 +214,7 @@ export default {
       state.currentMessage = message;
     },
     setPlan(state, plan){
+      state.plan.Plan_id = plan.Plan_id;
       state.plan.Start_date = plan.Start_date;
       state.plan.End_date = plan.End_date;
       state.plan.Destination = plan.Destination;
@@ -185,6 +224,34 @@ export default {
       state.plan.Members = plan.Members;
       state.plan.Purpose = plan.Purpose;
       state.plan.Tourist_spots = plan.Tourist_spots;
+    },
+    setPlanData(state, planData) {
+      state.planData = Array.isArray(planData) ? planData : [];
+      console.log('プラン一覧を取得:', state.planData);
+    },
+    setFormattedPlan(state, rawPlan) { // 日付をフォームに合わせて整形&プラン情報を取得
+      function formatDate(dateStr) {
+        const parts = dateStr.split('T');
+        return parts[0];
+      }
+      state.plan.Plan_id = rawPlan.Plan_id;
+      state.plan.Start_date = formatDate(rawPlan.Start_date);
+      state.plan.End_date = formatDate(rawPlan.End_date);
+      state.plan.Destination = rawPlan.Destination;
+      state.plan.Transportation = rawPlan.Transportation;
+      state.plan.Accommodation = rawPlan.Accommodation;
+      state.plan.Budget = rawPlan.Budget;
+      state.plan.Members = rawPlan.Members;
+      state.plan.Purpose = rawPlan.Purpose;
+      state.plan.Tourist_spots = rawPlan.Tourist_spots;
+    },
+    setUpdatePlan(state, response) {
+      state.updatePlan = response.data;
+      console.log('プラン更新結果:', state.updatePlan);
+    },
+    setDeletePlan(state, response) {
+      state.deletePlan = response.data;
+      console.log('プラン削除結果:', state.deletePlan);
     },
     setAlertShow(state, value) {
         state.ui.showAlert = value;
@@ -373,11 +440,6 @@ export default {
 
     const Azure_thread_id = user.Azure_thread_id;
 
- console.log('送信するuser:', user);
-  console.log('送信するmessage:', message);
-  console.log('user.User_id:', user?.User_id);
-  console.log('user.Azure_thread_id:', Azure_thread_id);
-
     try{
       const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Send_message?';
       
@@ -443,6 +505,71 @@ export default {
     } catch (error) {
         console.error("プラン登録エラー:", error);
         return { success: false, message: error.response?.data };
+    }
+  },
+  async getAllPlans({ commit}, user) { // プラン一覧取得
+    console.log('プラン一覧の取得を開始');
+    try {
+      const url = `https://m3h-suzuki-task09.azurewebsites.net/api/Get_plan?`;
+      const response = await axios.get(url + 'User_id=' + user.User_id);
+      
+      commit('setPlanData', response.data.List || []);
+      console.log(response.data)
+      return { success: true };
+      
+    } catch(error) {
+      console.error("プラン取得エラー:", error.message);
+      commit('setPlanData', []);
+      commit('setAlertShow', true);
+      commit('setAlertMessage', 'プラン一覧の取得に失敗しました');
+      commit('setAlertType', 'error');
+      return { success: false };
+    }
+  },
+  async updatePlan({ commit }, {plan, user }) { // プラン更新
+    console.log('プラン更新開始');
+    try {
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Update_plan?';
+      const response = await axios.get(url + 
+        'Plan_id=' + plan.Plan_id + 
+        '&User_id=' + user.User_id +
+        '&Start_date=' + plan.Start_date +
+        '&End_date=' + plan.End_date +
+        '&Destination=' + encodeURIComponent(plan.Destination) +
+        '&Transportation=' + encodeURIComponent(plan.Transportation) +
+        '&Accommodation=' + encodeURIComponent(plan.Accommodation) +
+        '&Budget=' + plan.Budget + 
+        '&Members=' + plan.Members +
+        '&Purpose=' + encodeURIComponent(plan.Purpose) +
+        '&Tourist_spots=' + encodeURIComponent(plan.Tourist_spots)
+      );
+
+      if (response.data.includes('変更しました')) {
+        commit('setPlan', plan);
+        return { success: true };
+      } else {
+        return { success: false, message: response.data };
+      }
+    } catch (error) {
+      console.error("プラン更新エラー:", error);
+      return { success: false, message: error.response?.data };
+    }
+  },
+  async deletePlan({ commit}, plan) { // プラン削除
+    console.log('プラン削除開始');
+    try {
+      const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Delete_plan?';
+      const response = await axios.get(url + 'Plan_id=' + plan.Plan_id);
+    
+      if (response.data.includes('削除しました')) {
+        commit('setPlan', plan);
+        return { success: true };
+      } else {
+        return { success: false, message: response.data };
+      }
+    } catch (error) {
+      console.error("プラン削除エラー:", error);
+      return { success: false, message: error.response?.data };
     }
   },
   validatePlan({ commit, state }) { // プラン登録時の未入力チェック

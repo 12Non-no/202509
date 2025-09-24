@@ -7,6 +7,7 @@ import SignupView from '../views/SignupView.vue'
 import ChatView from '../views/ChatView.vue'
 import PlanView from '../views/PlanView.vue'
 import HotelSearchView from '../views/HotelSearchView.vue'
+import AllPlanView from '../views/AllPlanView.vue'
 
 Vue.use(VueRouter)
 
@@ -45,6 +46,23 @@ const routes = [
     path: '/hotel',
     name: 'hotel',
     component: HotelSearchView
+  },
+  {
+    path: '/allplan',
+    name: 'AllPlanView',
+    component: AllPlanView
+  },
+  {
+    path: '/plan/:planId',
+    name: 'planDetails',
+    component: PlanView,
+    props: true
+  },
+  {
+    path: '/edit/:planId',// URLにプランIDを含める
+    name: 'editPlan',
+    component: PlanView,
+    props: true
   }
 ]
 

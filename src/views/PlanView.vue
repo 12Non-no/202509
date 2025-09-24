@@ -12,7 +12,7 @@
       <v-card class="mx-auto pt-10 pb-10 rounded-xl pa-4" width="700px" style="background-color: rgba(255, 255, 255, 0.6)">
             <div class="d-flex align-center justify-center pa-12">
   <div class="mx-auto" style="max-width: 600px; width: 100%; hight: 80%">
-    <form @submit.prevent="insertPlan">
+    <form @submit.prevent="savePlan">
       <div class="mb-5">
         <v-row>
           <v-col cols="6">
@@ -69,7 +69,14 @@
       </div>
 
       <div>
-        <v-btn type="submit" color="primary">登録</v-btn>
+        <v-row justify="center" class="mt-4">
+          <v-col cols="auto">
+            <v-btn type="submit" color="primary">登録</v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn class="" color="error" @click="deletePlan">削除</v-btn>
+          </v-col>
+        </v-row>
       </div>
     </form>
   </div>
@@ -91,9 +98,19 @@
   <script>
     export default{
       name: 'PlanView',
+      props: ['planId'],
       data() {
         return {
           errorMessage: '',
+        }
+      },
+      mounted() {
+        if (this.planId) {
+          const planList = this.$store.state.product.planData;
+          const targetPlan = planList.find(p => p.Plan_id === parseInt(this.planId));
+          if (targetPlan) {
+            this.$store.commit('product/setFormattedPlan', targetPlan);
+          }
         }
       },
       computed: {
@@ -118,32 +135,54 @@
         },
       },
       methods: {
-         async insertPlan(){
+         async savePlan(){
           // 必須項目確認
           const isValid = await this.$store.dispatch('product/validatePlan');
           if (!isValid) return;
           try {
             const result = await this.$store.dispatch('product/sessionCheck', this.$store.state.product.session);
             
-            if (result.success){
-              console.log('セッション確認成功');
-              const planResult = await this.$store.dispatch('product/insertPlan', {plan:this.$store.state.product.plan, user:this.$store.state.product.user});
+            if (!result.success) throw new Error('セッション失敗');
+              let planResult;
 
-              if(planResult.success){
+              if (this.plan.Plan_id) {
+                // 編集
+                planResult = await this.$store.dispatch('product/updatePlan', { plan: this.plan, user: this.$store.state.product.user });
+              } else {
+                // 新規登録
+                planResult = await this.$store.dispatch('product/insertPlan', { plan: this.$store.state.product.plan, user: this.$store.state.product.user });
+              }
+
+
+            if(planResult.success){
                 console.log('プラン登録成功');
                 this.$store.commit('product/setSnackbarShow', true);
-                this.$store.commit('product/setSnackbarMessage', '旅行プランの登録が完了しました！');
+                this.$store.commit('product/setSnackbarMessage', this.plan.Plan_id ? '旅行プランを更新しました！' : '旅行プランの登録が完了しました！');
               }else{
                 this.$store.commit('product/setAlertShow', true);
                 this.$store.commit('product/setAlertMessage', planResult.message);
                 this.$store.commit('product/setAlertType', 'error');
               }
-            }
-          } catch (error) {
+            } catch (error) {
             this.$store.commit('product/setAlertShow', true);
             this.$store.commit('product/setAlertMessage', 'システムエラーが発生しました');
             this.$store.commit('product/setAlertType', 'error');
           }
+        },
+        async deletePlan() {
+          const confirmDelete = confirm('このプランを削除してもよろしいですか？');
+          if (!confirmDelete) return;
+
+          const result = await this.$store.dispatch('product/deletePlan', this.$store.state.product.plan);
+            if (result.success) {
+              this.$store.commit('product/setSnackbarShow', true);
+              this.$store.commit('product/setSnackbarMessage', 'プランを削除しました');
+              this.$router.push('/allplan');
+            } else {
+              this.$store.commit('product/setAlertShow', true);
+              this.$store.commit('product/setAlertMessage', result.message);
+              this.$store.commit('product/setAlertType', 'error');
+            }
         }
       }
     };
