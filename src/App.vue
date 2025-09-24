@@ -5,7 +5,10 @@
       color="rgba(255, 255, 255, 0.6)"
       dark
     >
-      
+      <v-img src="https://i.gyazo.com/b6b274cdc48f945d2f06cf10484b080d.png" contain class="mt-2 ml-4 mb-4" max-width="40"></v-img>
+      <v-toolbar-title class="black--text mr-4 text-h4">みちしるべ
+      </v-toolbar-title>
+
       <v-spacer></v-spacer>
 
       <!-- ログイン済みの場合 -->
