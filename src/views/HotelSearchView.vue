@@ -125,31 +125,15 @@
 <script>
 export default {
   name: 'HotelView',
-  // watchを追加
-  watch: {
-    selectedPref(newVal, oldVal) {
-      console.log('selectedPref changed:', oldVal, '=>', newVal);
-      console.log('新しいareaList:', this.areaList);
-    }
-  },
   computed: {
     prefList() {
-      // デバッグ用: 都道府県リストの内容を確認
-      const list = this.$store.getters['product/prefectureList'];
-      console.log('prefList取得結果:', list);
-      return list;
+      return this.$store.getters['product/prefectureList'];
     },
     areaList() {
-      // デバッグ用: エリアリストの内容を確認
-      const list = this.$store.getters['product/areaList'];
-      console.log('areaList取得結果:', list);
-      return list;
+      return this.$store.getters['product/areaList'];
     },
     detailList() {
-      // デバッグ用: 詳細エリアリストの内容を確認
-      const list = this.$store.getters['product/detailList'];
-      console.log('detailList取得結果:', list);
-      return list;
+      return this.$store.getters['product/detailList'];
     },
     hotels() {
       return this.$store.state.product.hotelResults;
@@ -159,12 +143,6 @@ export default {
         return this.$store.state.product.selectedPrefecture;
       },
       set(value) {
-        // デバッグ用: 都道府県選択時のログ
-        console.log('都道府県が選択されました:', value);
-        console.log('選択された都道府県のtext:', value?.text);
-        console.log('選択された都道府県のvalue:', value?.value);
-
-
         this.$store.commit('product/setSelectedPrefecture', value);
       }
     },
@@ -173,8 +151,6 @@ export default {
         return this.$store.state.product.selectedArea;
       },
       set(value) {
-        // デバッグ用: エリア選択時のログ
-        console.log('エリアが選択されました:', value);
         this.$store.commit('product/setSelectedArea', value);
       }
     },
@@ -183,8 +159,6 @@ export default {
         return this.$store.state.product.selectedDetail;
       },
       set(value) {
-        // デバッグ用: 詳細エリア選択時のログ
-        console.log('詳細エリアが選択されました:', value);
         this.$store.commit('product/setSelectedDetail', value);
       }
     },
@@ -217,8 +191,6 @@ export default {
     }
   },
   mounted() {
-    // デバッグ用: 画面表示時の初期状態を確認
-    console.log('=== ホテル検索画面が表示されました ===');
     this.$store.dispatch('product/getRakutenAreaCode');
   },
   
@@ -226,10 +198,6 @@ export default {
     async search() {
       // デバッグ用: 検索開始ログ
       console.log('=== ホテル検索を開始します ===');
-      console.log('現在の選択状態:');
-      console.log('- selectedPref:', this.selectedPref);
-      console.log('- selectedAreaData:', this.selectedAreaData);
-      console.log('- selectedDetailData:', this.selectedDetailData);
       
       this.$store.commit('product/clearAllMessages');
       
@@ -248,36 +216,25 @@ export default {
             adultNum: this.people
           };
           
-          // デバッグ用: 検索パラメータの詳細確認
-          console.log('検索パラメータ:', params);
-          
           const hotelResult = await this.$store.dispatch('product/searchHotels', params);
           
           if (hotelResult.success) {
-            // デバッグ用: 検索成功時のログ
-            console.log('ホテル検索成功:', hotelResult);
             this.$store.commit('product/setSnackbarShow', true);
             this.$store.commit('product/setSnackbarMessage', hotelResult.message);
             this.$store.commit('product/setSnackbarColor', 'success');
           } else {
-            // デバッグ用: 検索失敗時のログ
-            console.log('ホテル検索失敗:', hotelResult);
             this.$store.commit('product/setAlertShow', true);
             this.$store.commit('product/setAlertMessage', hotelResult.message);
             this.$store.commit('product/setAlertType', 'error');
           }
         } else {
-          // デバッグ用: セッション確認失敗時のログ
-          console.log('セッション確認失敗:', sessionResult);
           this.$store.commit('product/setAlertShow', true);
           this.$store.commit('product/setAlertMessage', sessionResult.message);
           this.$store.commit('product/setAlertType', 'error');
           this.$router.push('/');
         }
       } catch (error) {
-        // デバッグ用: 例外発生時の詳細ログ
-        console.error('ホテル検索で例外発生:', error);
-        console.error('エラーの詳細:', error.response?.data);
+        console.error('ホテル検索エラー:', error);
         this.$store.commit('product/setAlertShow', true);
         this.$store.commit('product/setAlertMessage', 'システムエラーが発生しました。');
         this.$store.commit('product/setAlertType', 'error');
