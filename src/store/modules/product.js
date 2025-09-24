@@ -475,15 +475,7 @@ export default {
     try {
       const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Get_area_codes';
 
-// デバッグ用: リクエスト前の確認
-    console.log('API呼び出し開始:', url);
-
       const response = await axios.get(url);
-
-      // デバッグ用: レスポンス全体を確認
-    console.log('APIレスポンス全体:', response);
-    console.log('APIレスポンスのdata:', response.data);
-    console.log('response.data.status:', response.data.status);
       
       if (response.data.status === "Success") {
 
@@ -492,27 +484,30 @@ export default {
 
         const data = JSON.parse(response.data.data);
 
-        // デバッグ用: パース後のデータ確認
+        // デバッグ用: 構造を詳しく確認
       console.log('パース後のdata:', data);
       console.log('data.areaClasses:', data.areaClasses);
-      console.log('data.areaClasses.largeClasses:', data.areaClasses.largeClasses);
-      console.log('data.areaClasses.largeClasses[0]:', data.areaClasses.largeClasses[0]);
-      console.log('middleClasses:', data.areaClasses.largeClasses[0].middleClasses);
 
+      if (data.areaClasses && data.areaClasses.largeClasses) {
+        console.log('largeClasses:', data.areaClasses.largeClasses);
+        console.log('largeClasses[0]:', data.areaClasses.largeClasses[0]);
+        
+        // 初心者らしく安全にアクセス
+        const largeClass = data.areaClasses.largeClasses[0];
+        if (largeClass && largeClass.middleClasses) {
+          console.log('middleClasses見つかりました:', largeClass.middleClasses);
+          console.log('データの長さ:', largeClass.middleClasses.length);
 
         console.log('地区コード取得成功');
 
-        // デバッグ用: commit前の確認
-      const middleClasses = data.areaClasses.largeClasses[0].middleClasses;
-      console.log('commitする予定のデータ:', middleClasses);
-      console.log('データの長さ:', middleClasses.length);
-
-
         commit('setRakutenAreaCode', data.areaClasses.largeClasses[0].middleClasses);
-
-        // デバッグ用: commit後の確認は不可（stateに直接アクセスできないため）
-      console.log('commitが完了しました');
-
+} else {
+          console.error('middleClassesが見つかりません');
+          console.log('largeClass:', largeClass);
+        }
+      } else {
+        console.error('areaClassesまたはlargeClassesが見つかりません');
+      }
       } else {
       // デバッグ用: Status が Success でない場合
       console.error('API Status が Success ではありません:', response.data.status);
