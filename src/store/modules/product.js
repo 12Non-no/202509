@@ -73,97 +73,68 @@ export default {
     return list;
   },
   areaList(state) {
-  console.log('=== areaList getter 開始 ===');
-  console.log('selectedPrefecture.value:', state.selectedPrefecture.value);
-  
   if (!state.selectedPrefecture) {
-    console.log('都道府県が選択されていません');
     return [];
   }
   
   const areas = [];
   
-  console.log('rakutenAreaCodes.length:', state.rakutenAreaCodes.length);
-  
   for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
     const item = state.rakutenAreaCodes[i];
-    console.log(`item[${i}]:`, item);
     
     if (item.middleClass && item.middleClass.length > 0) {
       const middleClass = item.middleClass[0];
-      console.log(`middleClass[${i}]:`, middleClass.middleClassCode, middleClass.middleClassName);
       
       if (middleClass.middleClassCode === state.selectedPrefecture.value) {
-        console.log('*** マッチする都道府県発見 ***');
-        console.log('middleClass:', middleClass);
-        console.log('smallClasses:', middleClass.smallClasses);
         
-        if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
-          console.log('smallClasses数:', middleClass.smallClasses.length);
+        // 2番目の要素にsmallClassesがあるかチェック
+        if (item.middleClass.length > 1) {
+          const secondElement = item.middleClass[1];
           
-          for (let j = 0; j < middleClass.smallClasses.length; j++) {
-            const smallItem = middleClass.smallClasses[j];
-            console.log(`smallItem[${j}]:`, smallItem);
+          if (secondElement.smallClasses && secondElement.smallClasses.length > 0) {
             
-            if (smallItem.smallClass && smallItem.smallClass.length > 0) {
-              const smallClass = smallItem.smallClass[0];
-              console.log('smallClass:', smallClass);
+            for (let j = 0; j < secondElement.smallClasses.length; j++) {
+              const smallItem = secondElement.smallClasses[j];
               
-              areas.push({
-                text: smallClass.smallClassName,
-                value: smallClass.smallClassCode
-              });
+              if (smallItem.smallClass && smallItem.smallClass.length > 0) {
+                const smallClass = smallItem.smallClass[0];
+                
+                areas.push({
+                  text: smallClass.smallClassName,
+                  value: smallClass.smallClassCode
+                });
+              }
             }
           }
-        } else {
-          console.log('smallClassesが存在しません');
         }
         break;
       }
     }
   }
-  
-  console.log('最終的なareas:', areas);
-  console.log('=== areaList getter 終了 ===');
   return areas;
 },
   detailList(state) {
-    if (!state.selectedArea) {
+  if (!state.selectedArea) {
     return [];
   }
-    if (state.selectedPrefecture && state.selectedPrefecture.value === 'tokyo' &&
-        state.selectedArea && state.selectedArea.value === 'tokyo') {
-      // 楽天APIの実際のdetailClassesから取得
-    for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
-      const item = state.rakutenAreaCodes[i];
-      
-      if (item.middleClass && item.middleClass.length > 0) {
-        const middleClass = item.middleClass[0];
-        
-        if (middleClass.middleClassCode === 'tokyo' && middleClass.smallClasses) {
-          for (let j = 0; j < middleClass.smallClasses.length; j++) {
-            const smallItem = middleClass.smallClasses[j];
-            
-            if (smallItem.smallClass && smallItem.smallClass.length > 0) {
-              const smallClass = smallItem.smallClass[0];
-              
-              if (smallClass.smallClassCode === 'tokyo' && smallClass.detailClasses) {
-                const details = [];
-                for (let k = 0; k < smallClass.detailClasses.length; k++) {
-                  const detailItem = smallClass.detailClasses[k];
-                  details.push({
-                    text: detailItem.detailClass.detailClassName,
-                    value: detailItem.detailClass.detailClassCode
-                  });
-                }
-                return details;
-              }
-            }
-          }
-        }
-      }
-    }
+  
+  // 東京23区の場合のみ詳細エリアを表示（固定データ）
+  if (state.selectedPrefecture && state.selectedPrefecture.value === 'tokyo' &&
+      state.selectedArea && state.selectedArea.value === 'tokyo') {
+    
+    return [
+      { text: '東京駅・銀座・秋葉原・東陽町・葛西', value: 'A' },
+      { text: '新橋・汐留・浜松町・お台場', value: 'B' },
+      { text: '赤坂・六本木・霞ヶ関・永田町', value: 'C' },
+      { text: '渋谷・恵比寿・目黒・二子玉川', value: 'D' },
+      { text: '品川・大井町・蒲田・羽田空港', value: 'E' },
+      { text: '新宿・中野・荻窪・四谷', value: 'F' },
+      { text: '池袋・赤羽・巣鴨・大塚', value: 'G' },
+      { text: '東京ドーム・飯田橋・御茶ノ水', value: 'H' },
+      { text: '上野・浅草・錦糸町・新小岩・北千住', value: 'I' }
+    ];
   }
+  
   return [];
 }
   },
@@ -246,22 +217,18 @@ export default {
       state.hotelResults = results;
     },
     setRakutenAreaCode(state, areaCodes) {
-      console.log('地区コードを保存します');
       state.rakutenAreaCodes = areaCodes;
     },
     setSelectedPrefecture(state, prefecture) {
-      console.log('都道府県を選択:', prefecture);
       state.selectedPrefecture = prefecture;
       state.selectedArea = null;
       state.selectedDetail = null;
     },
     setSelectedArea(state, area) {
-      console.log('エリアを選択:', area);
       state.selectedArea = area;
       state.selectedDetail = null;
     },
     setSelectedDetail(state, detail) {
-      console.log('詳細エリアを選択:', detail);
       state.selectedDetail = detail;
     },
     setHotelSearchCheckin(state, date) {
@@ -564,8 +531,8 @@ export default {
 },
   async searchHotels({ commit }, searchData) {
     console.log('ホテル検索を開始します');
+    console.log('送信するsearchData:', searchData);
     try {
-      // URLを作る
       const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Hotel_search?';
       let params = 'prefectureCode=' + searchData.prefectureCode +
                    '&areaCode=' + searchData.areaCode +
@@ -576,7 +543,9 @@ export default {
       // 詳細コードがある場合は追加
       if (searchData.detailCode) {
         params += '&detailCode=' + searchData.detailCode;
+
       }
+
       
       // APIを呼び出す
       const response = await axios.get(url + params);
@@ -596,7 +565,7 @@ export default {
           for (let i = 0; i < data.hotels.length; i++) {
             const hotel = data.hotels[i].hotel[0].hotelBasicInfo;
             
-            // 簡単なホテルデータを作る
+            // ホテルデータを作る
             const simpleHotel = {
               hotelNo: hotel.hotelNo,
               hotelName: hotel.hotelName,

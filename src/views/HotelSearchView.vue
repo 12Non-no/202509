@@ -196,8 +196,7 @@ export default {
   
   methods: {
     async search() {
-      // デバッグ用: 検索開始ログ
-      console.log('=== ホテル検索を開始します ===');
+      console.log('ホテル検索を開始');
       
       this.$store.commit('product/clearAllMessages');
       
