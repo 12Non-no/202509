@@ -73,43 +73,60 @@ export default {
     return list;
   },
   areaList(state) {
-    console.log('=== areaList getter 開始 ===');
-
-    if (!state.selectedPrefecture) {
-      return [];
-    }
-
-    console.log('selectedPrefecture.value:', state.selectedPrefecture.value);
-
-    const areas = [];
-    for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
-      const item = state.rakutenAreaCodes[i];
-
-      if (item.middleClass && item.middleClass.length > 0) {
-        const middleClass = item.middleClass[0];
-
-        if (middleClass.middleClassCode === state.selectedPrefecture.value) {
-          if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
+  console.log('=== areaList getter 開始 ===');
+  console.log('selectedPrefecture.value:', state.selectedPrefecture.value);
+  
+  if (!state.selectedPrefecture) {
+    console.log('都道府県が選択されていません');
+    return [];
+  }
+  
+  const areas = [];
+  
+  console.log('rakutenAreaCodes.length:', state.rakutenAreaCodes.length);
+  
+  for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
+    const item = state.rakutenAreaCodes[i];
+    console.log(`item[${i}]:`, item);
+    
+    if (item.middleClass && item.middleClass.length > 0) {
+      const middleClass = item.middleClass[0];
+      console.log(`middleClass[${i}]:`, middleClass.middleClassCode, middleClass.middleClassName);
+      
+      if (middleClass.middleClassCode === state.selectedPrefecture.value) {
+        console.log('*** マッチする都道府県発見 ***');
+        console.log('middleClass:', middleClass);
+        console.log('smallClasses:', middleClass.smallClasses);
         
+        if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
+          console.log('smallClasses数:', middleClass.smallClasses.length);
+          
           for (let j = 0; j < middleClass.smallClasses.length; j++) {
             const smallItem = middleClass.smallClasses[j];
-
-          if (smallItem.smallClass && smallItem.smallClass.length > 0) {
-                const smallClass = smallItem.smallClass[0];
-
+            console.log(`smallItem[${j}]:`, smallItem);
+            
+            if (smallItem.smallClass && smallItem.smallClass.length > 0) {
+              const smallClass = smallItem.smallClass[0];
+              console.log('smallClass:', smallClass);
+              
               areas.push({
                 text: smallClass.smallClassName,
                 value: smallClass.smallClassCode
               });
             }
           }
+        } else {
+          console.log('smallClassesが存在しません');
         }
-          break
-        }
+        break;
       }
     }
-    return [];
-  },
+  }
+  
+  console.log('最終的なareas:', areas);
+  console.log('=== areaList getter 終了 ===');
+  return areas;
+},
   detailList(state) {
     if (!state.selectedArea) {
     return [];
