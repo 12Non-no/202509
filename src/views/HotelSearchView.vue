@@ -84,7 +84,7 @@
       
       <!-- 検索ボタン -->
       <div class="text-center mb-4">
-        <v-btn @click="search" color="primary" v-if="selectedAreaData">
+        <v-btn @click="search" color="primary" :disabled="!selectedPref">
           ホテルを検索
         </v-btn>
       </div>

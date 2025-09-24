@@ -74,15 +74,10 @@ export default {
   },
   areaList(state) {
     console.log('=== areaList getter 開始 ===');
-  console.log('selectedPrefecture:', state.selectedPrefecture);
-  console.log('rakutenAreaCodes.length:', state.rakutenAreaCodes.length);
 
     if (!state.selectedPrefecture) {
-      console.log('都道府県が選択されていません');
       return [];
     }
-
-    console.log('選択された都道府県のvalue:', state.selectedPrefecture.value);
 
     const areas = [];
     for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
@@ -90,13 +85,9 @@ export default {
       if (item.middleClass && item.middleClass.length > 0) {
         const middleClass = item.middleClass[0];
 
-        console.log(`[${i}] middleClass:`, middleClass.middleClassCode, middleClass.middleClassName);
-
         if (middleClass.middleClassCode === state.selectedPrefecture.value) {
 
-          console.log('*** 一致する都道府県が見つかりました ***');
-        console.log('middleClass:', middleClass);
-        console.log('smallClasses:', middleClass.smallClasses);
+          console.log('*** 一致する都道府県が見つかりました ***' ,middleClass.middleClassName);
 
         // smallClassesがある場合
         if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
@@ -104,12 +95,9 @@ export default {
 
           for (let j = 0; j < middleClass.smallClasses.length; j++) {
             const smallItem = middleClass.smallClasses[j];
-            console.log(`smallItem[${j}]:`, smallItem);
 
             if (smallItem.smallClass && smallItem.smallClass.length > 0) {
               const smallClass = smallItem.smallClass[0];
-              
-              console.log('smallClass:', smallClass);
 
               areas.push({
                 text: smallClass.smallClassName,
@@ -117,14 +105,19 @@ export default {
               });
             }
           }
-        }
+      } else{
+        // smallClassesがない場合は、都道府県名をそのまま使用
+          console.log('smallClassesがないので都道府県名をそのまま使用');
+          areas.push({
+            text: middleClass.middleClassName,
+            value: middleClass.middleClassCode
+          });
+      }
         break;
       }
     }
   }
   console.log('最終的なareaList:', areas);
-  console.log('=== areaList getter 終了 ===');
-  
     return areas;
   },
   detailList(state) {
