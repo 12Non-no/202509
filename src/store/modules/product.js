@@ -189,18 +189,7 @@ export default {
     },
     setRakutenAreaCode(state, areaCodes) {
       console.log('地区コードを保存します');
-
-      // デバッグ用: 受け取ったデータの確認
-  console.log('受け取ったareaCodes:', areaCodes);
-  console.log('areaCodesの型:', typeof areaCodes);
-  console.log('areaCodesの長さ:', areaCodes?.length);
-
       state.rakutenAreaCodes = areaCodes;
-
-      // デバッグ用: 保存後のstate確認
-  console.log('保存後のstate.rakutenAreaCodes:', state.rakutenAreaCodes);
-  console.log('保存後の長さ:', state.rakutenAreaCodes?.length);
-  
     },
     setSelectedPrefecture(state, prefecture) {
       console.log('都道府県を選択:', prefecture);
@@ -494,14 +483,14 @@ export default {
       // デバッグ用: レスポンス全体を確認
     console.log('APIレスポンス全体:', response);
     console.log('APIレスポンスのdata:', response.data);
-    console.log('response.data.Status:', response.data.Status);
+    console.log('response.data.status:', response.data.status);
       
-      if (response.data.Status === "Success") {
+      if (response.data.status === "Success") {
 
         // デバッグ用: パース前の文字列確認
-      console.log('パース前のData:', response.data.Data);
+      console.log('パース前のData:', response.data.data);
 
-        const data = JSON.parse(response.data.Data);
+        const data = JSON.parse(response.data.data);
 
         // デバッグ用: パース後のデータ確認
       console.log('パース後のdata:', data);
@@ -526,7 +515,7 @@ export default {
 
       } else {
       // デバッグ用: Status が Success でない場合
-      console.error('API Status が Success ではありません:', response.data.Status);
+      console.error('API Status が Success ではありません:', response.data.status);
     }
     } catch(error) {
       console.error("エラーが発生しました:", error);
