@@ -61,12 +61,15 @@ export default {
     }
     const list = [];
     for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
-      const pref = state.rakutenAreaCodes[i];
+      const item = state.rakutenAreaCodes[i];
+      if (item.middleClass && item.middleClass.length > 0) {
+      const middleClass = item.middleClass[0]; // 最初の要素を取得
       list.push({
-        text: pref.middleClass.middleClassName,
-        value: pref.middleClass.middleClassCode
+        text: middleClass.middleClassName,
+        value: middleClass.middleClassCode
       });
     }
+  }
     return list;
   },
   areaList(state) {
@@ -75,20 +78,27 @@ export default {
     }
     const areas = [];
     for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
-      const pref = state.rakutenAreaCodes[i];
-      if (pref.middleClass.middleClassCode === state.selectedPrefecture.value) {
-        if (pref.smallClasses) {
-          for (let j = 0; j < pref.smallClasses.length; j++) {
-            const area = pref.smallClasses[j];
-            areas.push({
-              text: area.smallClass.smallClassName,
-              value: area.smallClass.smallClassCode
-            });
+      const item = state.rakutenAreaCodes[i];
+      if (item.middleClass && item.middleClass.length > 0) {
+        const middleClass = item.middleClass[0];
+        if (middleClass.middleClassCode === state.selectedPrefecture.value) {
+        // smallClassesがある場合
+        if (middleClass.smallClasses) {
+          for (let j = 0; j < middleClass.smallClasses.length; j++) {
+            const smallItem = middleClass.smallClasses[j];
+            if (smallItem.smallClass && smallItem.smallClass.length > 0) {
+              const smallClass = smallItem.smallClass[0];
+              areas.push({
+                text: smallClass.smallClassName,
+                value: smallClass.smallClassCode
+              });
+            }
           }
         }
         break;
       }
     }
+  }
     return areas;
   },
   detailList(state) {
@@ -479,17 +489,11 @@ export default {
       
       if (response.data.status === "Success") {
         const data = JSON.parse(response.data.data);
+        
+        const largeClassData = data.areaClasses.largeClasses[0];
 
-        // デバッグ用: largeClass配列の中身を確認
-      const largeClassData = data.areaClasses.largeClasses[0];
-      console.log('largeClassData:', largeClassData);
-      console.log('largeClass配列:', largeClassData.largeClass);
-      
       // largeClass配列の中身を確認
       if (largeClassData.largeClass && largeClassData.largeClass.length > 0) {
-        for (let i = 0; i < largeClassData.largeClass.length; i++) {
-          console.log(`largeClass[${i}]:`, largeClassData.largeClass[i]);
-        }
         
         // middleClassesを探す
         let middleClasses = null;
@@ -497,23 +501,14 @@ export default {
           const item = largeClassData.largeClass[i];
           if (item.middleClasses) {
             middleClasses = item.middleClasses;
-            console.log('middleClasses見つかりました!');
-            console.log('middleClasses:', middleClasses);
             break;
           }
         }
         if (middleClasses && middleClasses.length > 0) {
-        console.log('地区コード保存します。件数:', middleClasses.length);
           commit('setRakutenAreaCode', middleClasses);
           console.log('地区コード保存完了');
- } else {
-          console.error('middleClassesが見つかりませんでした');
         }
-      } else {
-        console.error('largeClass配列がありません');
       }
-    } else {
-      console.error('API呼び出し失敗');
     }
   } catch(error) {
     console.error("エラーが発生しました:", error);
