@@ -478,49 +478,47 @@ export default {
       const response = await axios.get(url);
       
       if (response.data.status === "Success") {
-
-        // デバッグ用: パース前の文字列確認
-      console.log('パース前のData:', response.data.data);
-
         const data = JSON.parse(response.data.data);
 
-        // デバッグ用: 構造を詳しく確認
-      console.log('パース後のdata:', data);
-      console.log('data.areaClasses:', data.areaClasses);
-
-      if (data.areaClasses && data.areaClasses.largeClasses) {
-        console.log('largeClasses:', data.areaClasses.largeClasses);
-        console.log('largeClasses[0]:', data.areaClasses.largeClasses[0]);
+        // デバッグ用: largeClass配列の中身を確認
+      const largeClassData = data.areaClasses.largeClasses[0];
+      console.log('largeClassData:', largeClassData);
+      console.log('largeClass配列:', largeClassData.largeClass);
+      
+      // largeClass配列の中身を確認
+      if (largeClassData.largeClass && largeClassData.largeClass.length > 0) {
+        for (let i = 0; i < largeClassData.largeClass.length; i++) {
+          console.log(`largeClass[${i}]:`, largeClassData.largeClass[i]);
+        }
         
-        // 初心者らしく安全にアクセス
-        const largeClass = data.areaClasses.largeClasses[0];
-        if (largeClass && largeClass.middleClasses) {
-          console.log('middleClasses見つかりました:', largeClass.middleClasses);
-          console.log('データの長さ:', largeClass.middleClasses.length);
-
-        console.log('地区コード取得成功');
-
-        commit('setRakutenAreaCode', data.areaClasses.largeClasses[0].middleClasses);
-} else {
-          console.error('middleClassesが見つかりません');
-          console.log('largeClass:', largeClass);
+        // middleClassesを探す
+        let middleClasses = null;
+        for (let i = 0; i < largeClassData.largeClass.length; i++) {
+          const item = largeClassData.largeClass[i];
+          if (item.middleClasses) {
+            middleClasses = item.middleClasses;
+            console.log('middleClasses見つかりました!');
+            console.log('middleClasses:', middleClasses);
+            break;
+          }
+        }
+        if (middleClasses && middleClasses.length > 0) {
+        console.log('地区コード保存します。件数:', middleClasses.length);
+          commit('setRakutenAreaCode', middleClasses);
+          console.log('地区コード保存完了');
+ } else {
+          console.error('middleClassesが見つかりませんでした');
         }
       } else {
-        console.error('areaClassesまたはlargeClassesが見つかりません');
+        console.error('largeClass配列がありません');
       }
-      } else {
-      // デバッグ用: Status が Success でない場合
-      console.error('API Status が Success ではありません:', response.data.status);
+    } else {
+      console.error('API呼び出し失敗');
     }
-    } catch(error) {
-      console.error("エラーが発生しました:", error);
-
-      // デバッグ用: エラー詳細
-    console.error("エラー詳細:", error.response?.data);
-    console.error("エラーステータス:", error.response?.status);
-
-    }
-  },
+  } catch(error) {
+    console.error("エラーが発生しました:", error);
+  }
+},
   async searchHotels({ commit }, searchData) {
     console.log('ホテル検索を開始します');
     try {
