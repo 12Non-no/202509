@@ -79,25 +79,53 @@ export default {
       return [];
     }
 
-    const areas = [];
+    console.log('selectedPrefecture.value:', state.selectedPrefecture.value);
+
+    // const areas = [];
     for (let i = 0; i < state.rakutenAreaCodes.length; i++) {
       const item = state.rakutenAreaCodes[i];
       if (item.middleClass && item.middleClass.length > 0) {
         const middleClass = item.middleClass[0];
 
+
+//追加した部分
+        if (middleClass.middleClassCode === 'aomori') {
+        console.log('=== 青森県の詳細構造 ===');
+        console.log('middleClass全体:', middleClass);
+        console.log('smallClasses:', middleClass.smallClasses);
+        
+        // middleClassの全プロパティを確認
+        for (let key in middleClass) {
+          console.log(`middleClass.${key}:`, middleClass[key]);
+        }
+      }
+
         if (middleClass.middleClassCode === state.selectedPrefecture.value) {
 
-          console.log('*** 一致する都道府県が見つかりました ***' ,middleClass.middleClassName);
+          console.log('選択された都道府県の詳細:', middleClass);
+          const areas = [];
 
-        // smallClassesがある場合
-        if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
-          console.log('smallClasses数:', middleClass.smallClasses.length);
+          // smallClassesを詳しく確認
+        if (middleClass.smallClasses) {
+          console.log('smallClasses確認:');
+
+        // // smallClassesがある場合
+        // if (middleClass.smallClasses && middleClass.smallClasses.length > 0) {
+        //   console.log('smallClasses数:', middleClass.smallClasses.length);
 
           for (let j = 0; j < middleClass.smallClasses.length; j++) {
             const smallItem = middleClass.smallClasses[j];
+            console.log(`smallClasses[${j}]:`, smallItem);
 
-            if (smallItem.smallClass && smallItem.smallClass.length > 0) {
-              const smallClass = smallItem.smallClass[0];
+          //   if (smallItem.smallClass && smallItem.smallClass.length > 0) {
+          //     const smallClass = smallItem.smallClass[0];
+
+          if (smallItem.smallClass) {
+              console.log(`smallClass配列:`, smallItem.smallClass);
+              
+              if (smallItem.smallClass.length > 0) {
+                const smallClass = smallItem.smallClass[0];
+                console.log('smallClass詳細:', smallClass);
 
               areas.push({
                 text: smallClass.smallClassName,
@@ -105,20 +133,24 @@ export default {
               });
             }
           }
+        }
       } else{
         // smallClassesがない場合は、都道府県名をそのまま使用
-          console.log('smallClassesがないので都道府県名をそのまま使用');
+          console.log('smallClassesが存在しません');
           areas.push({
             text: middleClass.middleClassName,
             value: middleClass.middleClassCode
           });
       }
-        break;
-      }
-    }
-  }
-  console.log('最終的なareaList:', areas);
+        console.log('最終的なareaList:', areas);
     return areas;
+      }
+    
+  }
+  
+}
+
+return [];
   },
   detailList(state) {
     if (state.selectedPrefecture && state.selectedPrefecture.value === 'tokyo' &&
