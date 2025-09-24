@@ -189,7 +189,18 @@ export default {
     },
     setRakutenAreaCode(state, areaCodes) {
       console.log('地区コードを保存します');
+
+      // デバッグ用: 受け取ったデータの確認
+  console.log('受け取ったareaCodes:', areaCodes);
+  console.log('areaCodesの型:', typeof areaCodes);
+  console.log('areaCodesの長さ:', areaCodes?.length);
+
       state.rakutenAreaCodes = areaCodes;
+
+      // デバッグ用: 保存後のstate確認
+  console.log('保存後のstate.rakutenAreaCodes:', state.rakutenAreaCodes);
+  console.log('保存後の長さ:', state.rakutenAreaCodes?.length);
+  
     },
     setSelectedPrefecture(state, prefecture) {
       console.log('都道府県を選択:', prefecture);
@@ -474,15 +485,56 @@ export default {
     console.log('地区コードを取得します');
     try {
       const url = 'https://m3h-suzuki-task09.azurewebsites.net/api/Get_area_codes';
+
+// デバッグ用: リクエスト前の確認
+    console.log('API呼び出し開始:', url);
+
       const response = await axios.get(url);
+
+      // デバッグ用: レスポンス全体を確認
+    console.log('APIレスポンス全体:', response);
+    console.log('APIレスポンスのdata:', response.data);
+    console.log('response.data.Status:', response.data.Status);
       
       if (response.data.Status === "Success") {
+
+        // デバッグ用: パース前の文字列確認
+      console.log('パース前のData:', response.data.Data);
+
         const data = JSON.parse(response.data.Data);
+
+        // デバッグ用: パース後のデータ確認
+      console.log('パース後のdata:', data);
+      console.log('data.areaClasses:', data.areaClasses);
+      console.log('data.areaClasses.largeClasses:', data.areaClasses.largeClasses);
+      console.log('data.areaClasses.largeClasses[0]:', data.areaClasses.largeClasses[0]);
+      console.log('middleClasses:', data.areaClasses.largeClasses[0].middleClasses);
+
+
         console.log('地区コード取得成功');
+
+        // デバッグ用: commit前の確認
+      const middleClasses = data.areaClasses.largeClasses[0].middleClasses;
+      console.log('commitする予定のデータ:', middleClasses);
+      console.log('データの長さ:', middleClasses.length);
+
+
         commit('setRakutenAreaCode', data.areaClasses.largeClasses[0].middleClasses);
-      }
+
+        // デバッグ用: commit後の確認は不可（stateに直接アクセスできないため）
+      console.log('commitが完了しました');
+
+      } else {
+      // デバッグ用: Status が Success でない場合
+      console.error('API Status が Success ではありません:', response.data.Status);
+    }
     } catch(error) {
       console.error("エラーが発生しました:", error);
+
+      // デバッグ用: エラー詳細
+    console.error("エラー詳細:", error.response?.data);
+    console.error("エラーステータス:", error.response?.status);
+
     }
   },
   async searchHotels({ commit }, searchData) {
