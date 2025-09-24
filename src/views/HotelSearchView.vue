@@ -154,6 +154,10 @@ export default {
       set(value) {
         // デバッグ用: 都道府県選択時のログ
         console.log('都道府県が選択されました:', value);
+        console.log('選択された都道府県のtext:', value?.text);
+        console.log('選択された都道府県のvalue:', value?.value);
+
+
         this.$store.commit('product/setSelectedPrefecture', value);
       }
     },
@@ -208,18 +212,7 @@ export default {
   mounted() {
     // デバッグ用: 画面表示時の初期状態を確認
     console.log('=== ホテル検索画面が表示されました ===');
-    console.log('現在のrakutenAreaCodes:', this.$store.state.product.rakutenAreaCodes);
-    console.log('現在のselectedPrefecture:', this.$store.state.product.selectedPrefecture);
-    
-    // デバッグ用: 地区コード取得前の状態確認
-    console.log('地区コード取得を開始します...');
     this.$store.dispatch('product/getRakutenAreaCode');
-    
-    // デバッグ用: 少し待ってから結果確認（非同期処理のため）
-    setTimeout(() => {
-      console.log('5秒後の地区コード状態:', this.$store.state.product.rakutenAreaCodes);
-      console.log('5秒後の都道府県リスト:', this.$store.getters['product/prefectureList']);
-    }, 5000);
   },
   
   methods: {
