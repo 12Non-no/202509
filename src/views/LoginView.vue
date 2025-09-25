@@ -20,7 +20,7 @@
                 <div class="mx-20">
                 <!-- 入力フォーム -->
                   <v-row justify="center">
-                    <v-col cols="12" sm="9" md="4" >
+                    <v-col cols="6">
                     <!-- ユーザー名入力欄 -->
                       <v-text-field
                         v-model="User_id" 

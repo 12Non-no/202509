@@ -54,12 +54,16 @@ export default {
     }
   },
   methods: {
-    goToMyPage() {
-      this.$router.push('/mypage');
+    goToMyPage() { //現在マイページにいない場合のみ移動
+      if (this.$route.path !== '/mypage') {
+        this.$router.push('/mypage');
+      }
     },
     
     goToLogin() {
-      this.$router.push('/');
+      if (this.$route.path !== '/'){
+        this.$router.push('/');
+      }
     },
     
     logout() {
