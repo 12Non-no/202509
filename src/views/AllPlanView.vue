@@ -87,26 +87,6 @@ export default {
                 name: 'planDetails',
                 params: { planId: plan.Plan_id }
             });
-        },
-        
-        // プラン編集
-        editPlan(plan) {
-            this.$router.push({
-                name: 'editPlan',
-                params: { 
-                    planId: plan.Plan_id,
-                    planData: plan
-                }
-            });
-        },
-        
-        // プラン削除
-        deletePlan(plan) {
-            const confirmDelete = confirm(`「${plan.Destination}」の旅行プランを削除してもよろしいですか？`);
-            
-            if (confirmDelete) {
-                this.$store.dispatch('product/deletePlan', plan.Plan_id);
-            }
         }
     }
 };

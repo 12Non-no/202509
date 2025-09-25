@@ -253,6 +253,18 @@ export default {
       state.deletePlan = response.data;
       console.log('プラン削除結果:', state.deletePlan);
     },
+    setClearPlan(state) {
+      state.plan.Plan_id = null;
+      state.plan.Start_date = '';
+      state.plan.End_date = '';
+      state.plan.Destination = '';
+      state.plan.Transportation = '';
+      state.plan.Accommodation = '';
+      state.plan.Budget = '';
+      state.plan.Members = '';
+      state.plan.Purpose = '';
+      state.plan.Tourist_spots = '';
+    },
     setAlertShow(state, value) {
         state.ui.showAlert = value;
     },

@@ -105,12 +105,14 @@
         }
       },
       mounted() {
-        if (this.planId) {
+        if (this.planId) { //プラン一覧から遷移した場合はプラン情報をフォームに設定
           const planList = this.$store.state.product.planData;
           const targetPlan = planList.find(p => p.Plan_id === parseInt(this.planId));
           if (targetPlan) {
             this.$store.commit('product/setFormattedPlan', targetPlan);
           }
+        } else { //新規プラン登録時はフォームをクリア
+          this.$store.commit('product/setClearPlan');
         }
       },
       computed: {
@@ -177,7 +179,6 @@
             if (result.success) {
               this.$store.commit('product/setSnackbarShow', true);
               this.$store.commit('product/setSnackbarMessage', 'プランを削除しました');
-              this.$router.push('/allplan');
             } else {
               this.$store.commit('product/setAlertShow', true);
               this.$store.commit('product/setAlertMessage', result.message);

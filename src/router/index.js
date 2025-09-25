@@ -53,14 +53,8 @@ const routes = [
     component: AllPlanView
   },
   {
-    path: '/plan/:planId',
+    path: '/plan/:planId',// URLにプランIDを含める
     name: 'planDetails',
-    component: PlanView,
-    props: true
-  },
-  {
-    path: '/edit/:planId',// URLにプランIDを含める
-    name: 'editPlan',
     component: PlanView,
     props: true
   }
