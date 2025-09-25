@@ -24,3 +24,4 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 "# 202509" 
 "# 20252Q-suzuki-Back" 
+"# 20252Q-suzuki-Front" 
